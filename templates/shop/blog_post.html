@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ post.title }} | کشت‌دریپ{% endblock %}
+{% block content %}
+<article class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
+  <nav class="mb-5 text-sm text-slate-400">
+    <a class="hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
+    <span class="mx-1">/</span>
+    <a class="hover:text-cyanbtn" href="{% url 'blog' %}">وبلاگ</a>
+    <span class="mx-1">/</span>
+    <span class="text-slate-600">{{ post.title }}</span>
+  </nav>
+  <p class="mb-2 text-sm font-medium text-cyanbtn">{{ post.category }}</p>
+  <h1 class="mb-3 max-w-4xl text-2xl font-bold leading-10 md:text-3xl">{{ post.title }}</h1>
+  <p class="mb-8 text-sm text-slate-400">{{ post.date }} · {{ post.read_minutes }} دقیقه مطالعه</p>
+  {% if post.image %}
+    <img src="{% static post.image %}" alt="{{ post.title }}" class="mb-8 h-56 w-full max-w-3xl rounded-2xl object-cover md:h-72">
+  {% endif %}
+  <p class="mb-10 max-w-3xl text-base leading-8 text-slate-600">{{ post.intro }}</p>
+
+  {% if post.advantages %}
+  <h2 class="mb-3 text-xl font-bold">مزایای آبیاری قطره‌ای</h2>
+  <p class="mb-6 max-w-3xl leading-8 text-slate-600">{{ post.advantages_lead }}</p>
+  <div class="mb-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {% for item in post.advantages %}
+      <section class="rounded-xl border border-slate-200 bg-white p-5">
+        <h3 class="mb-2 font-bold">{{ item.title }}</h3>
+        <p class="leading-7 text-slate-500">{{ item.text }}</p>
+      </section>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if post.components %}
+  <h2 class="mb-3 text-xl font-bold">قطعات سامانه قطره‌ای</h2>
+  <p class="mb-6 max-w-3xl leading-8 text-slate-600">{{ post.components_lead }}</p>
+  <ol class="mb-12 space-y-4">
+    {% for item in post.components %}
+      <li class="rounded-xl border border-slate-200 bg-white p-5">
+        <div class="mb-1 flex flex-wrap items-baseline gap-2">
+          <span class="grid h-7 w-7 place-items-center rounded-full bg-cyanbtn/10 text-sm font-bold text-cyanbtn">{{ forloop.counter }}</span>
+          <h3 class="font-bold">{{ item.title }}</h3>
+          <span class="text-xs text-slate-400">{{ item.role }}</span>
+        </div>
+        <p class="leading-7 text-slate-500">{{ item.text }}</p>
+      </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+
+  {% for section in post.sections %}
+    <h2 class="mb-3 text-xl font-bold">{{ section.heading }}</h2>
+    {% if section.lead %}<p class="mb-6 max-w-3xl leading-8 text-slate-600">{{ section.lead }}</p>{% endif %}
+    {% if section.paragraphs %}
+      <div class="mb-10 max-w-3xl space-y-4">
+        {% for para in section.paragraphs %}
+          <p class="leading-8 text-slate-600">{{ para }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if section.cards %}
+      <div class="mb-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {% for item in section.cards %}
+          <section class="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 class="mb-2 font-bold">{{ item.title }}</h3>
+            <p class="leading-7 text-slate-500">{{ item.text }}</p>
+          </section>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if section.steps %}
+      <ol class="mb-12 space-y-4">
+        {% for item in section.steps %}
+          <li class="rounded-xl border border-slate-200 bg-white p-5">
+            <div class="mb-1 flex flex-wrap items-baseline gap-2">
+              <span class="grid h-7 w-7 place-items-center rounded-full bg-cyanbtn/10 text-sm font-bold text-cyanbtn">{{ forloop.counter }}</span>
+              <h3 class="font-bold">{{ item.title }}</h3>
+              {% if item.role %}<span class="text-xs text-slate-400">{{ item.role }}</span>{% endif %}
+            </div>
+            <p class="leading-7 text-slate-500">{{ item.text }}</p>
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+  {% endfor %}
+
+  <div class="max-w-3xl rounded-2xl border border-cyanbtn/20 bg-header p-6">
+    <p class="mb-4 leading-8 text-slate-600">{{ post.closing }}</p>
+    <a class="inline-flex rounded-xl bg-cyanbtn px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyanbtnHover" href="{% url post.cta_url_name %}{% if post.cta_query %}?category={{ post.cta_query }}{% endif %}">{{ post.cta_label }}</a>
+  </div>
+
+  {% if posts %}
+    <section class="mt-12">
+      <h2 class="mb-4 text-lg font-bold">مقاله‌های دیگر</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        {% for other in posts %}
+          <a class="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-cyanbtn" href="{% url 'blog_detail' other.slug %}">
+            <h3 class="mb-2 font-bold">{{ other.title }}</h3>
+            <p class="text-sm leading-7 text-slate-500">{{ other.excerpt }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</article>
+{% endblock %}

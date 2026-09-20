@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}وبلاگ آبیاری | کشت‌دریپ{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
+  <p class="mb-2 text-sm font-medium text-cyanbtn">آموزش و راهنما</p>
+  <h1 class="mb-3 text-2xl font-bold">وبلاگ کشت‌دریپ</h1>
+  <p class="mb-8 max-w-3xl leading-8 text-slate-600">نکات عملی درباره آبیاری قطره‌ای، انتخاب قطعات و مدیریت آب در مزرعه و باغ.</p>
+  <div class="grid gap-4 md:grid-cols-2">
+    {% for post in posts %}
+      <article class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-cyanbtn">
+        {% if post.image %}
+          <a href="{% url 'blog_detail' post.slug %}" class="block overflow-hidden">
+            <img src="{% static post.image %}" alt="{{ post.title }}" class="h-40 w-full object-cover">
+          </a>
+        {% endif %}
+        <div class="flex flex-1 flex-col p-5">
+        <p class="mb-2 text-xs text-slate-400">{{ post.category }} · {{ post.date }} · {{ post.read_minutes }} دقیقه مطالعه</p>
+        <h2 class="mb-2 text-lg font-bold"><a class="hover:text-cyanbtn" href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h2>
+        <p class="mb-4 grow leading-7 text-slate-500">{{ post.excerpt }}</p>
+        <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' post.slug %}">ادامه مطلب</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load persian %}
+{% block title %}سفارش ثبت شد | کشت‌دریپ{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-2xl px-4 py-12 xl:px-20">
+  <h1 class="mb-3 text-2xl font-bold">{{ name }}، سفارش شما دریافت شد.</h1>
+  <p class="mb-6 text-slate-500">سفارش به مبلغ {{ total|fa_num }} ثبت شد کارشناسان ما در اسرع وقت با شما تماس خواهند گرفت.</p>
+  <a class="inline-flex rounded-full bg-cyanbtn px-8 py-3 font-bold text-white hover:bg-cyanbtnHover" href="{% url 'catalog' %}">بازگشت به فروشگاه</a>
+</section>
+{% endblock %}

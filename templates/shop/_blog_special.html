@@ -1,0 +1,39 @@
+{% load static %}
+<section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
+  <div id="kd-blog-special" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
+    <div class="flex flex-col lg:flex-row">
+      <div class="min-w-0 flex-1 lg:w-2/3">
+        {% for post in blog_posts %}
+          <a href="{% url 'blog_detail' post.slug %}" class="kd-blog-slide block p-4 md:p-6 {% if not forloop.first %}hidden{% endif %}">
+            <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <h2 class="text-lg font-bold leading-8 md:text-xl">{{ post.title }}</h2>
+              <span class="shrink-0 text-sm text-slate-400">{{ post.date }}</span>
+            </div>
+            <div class="flex flex-col gap-4 md:flex-row md:items-start">
+              <div class="w-full shrink-0 overflow-hidden rounded-xl md:w-[42%]">
+                <img src="{% static post.image %}" alt="{{ post.title }}" class="h-44 w-full object-cover md:h-56">
+              </div>
+              <p class="min-w-0 flex-1 text-sm leading-7 text-slate-500 md:text-[15px] md:leading-8">{{ post.excerpt }}</p>
+            </div>
+          </a>
+        {% endfor %}
+        <div class="flex justify-center gap-1.5 pb-4 lg:hidden">
+          {% for post in blog_posts %}
+            <button type="button" class="kd-blog-dot h-2 rounded-full {% if forloop.first %}w-5 bg-cyanbtn{% else %}w-2 bg-slate-300{% endif %}" data-index="{{ forloop.counter0 }}" aria-label="مقاله {{ forloop.counter }}"></button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="hidden shrink-0 divide-y divide-slate-100 border-t border-slate-100 lg:flex lg:w-[34%] lg:flex-col lg:border-s lg:border-t-0">
+        {% for post in blog_posts %}
+          <button type="button" class="kd-blog-thumb flex w-full items-center gap-3 border-s-2 px-3 py-2.5 text-right transition {% if forloop.first %}border-s-cyanbtn bg-header{% else %}border-s-transparent hover:bg-header/70{% endif %}" data-index="{{ forloop.counter0 }}" title="{{ post.title }}">
+            <img src="{% static post.image %}" alt="" class="h-16 w-16 shrink-0 rounded-lg object-cover">
+            <span class="min-w-0">
+              <span class="mb-1 block line-clamp-2 text-sm font-semibold leading-6">{{ post.title }}</span>
+              <span class="block text-xs text-slate-400">{{ post.date }}</span>
+            </span>
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,77 @@
+{% load static %}
+<div class="w-full font-sans">
+  <div id="kd-finder" class="mx-auto flex w-full flex-col gap-3 md:h-[470px] md:flex-row md:items-stretch" dir="ltr">
+    <div class="order-2 grid h-[160px] w-full grid-cols-2 gap-3 md:order-1 md:flex md:h-auto md:w-[30%] md:flex-col">
+      <a href="{% url 'catalog' %}" class="relative min-h-0 overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-lg xl:rounded-md md:flex-1">
+        <img src="{% static 'img/head3.png' %}" alt="" class="h-full w-full object-cover">
+      </a>
+      <a href="#kd-main-module" class="relative min-h-0 overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-lg xl:rounded-md md:flex-1">
+        <img src="{% static 'img/head4.png' %}" alt="" class="h-full w-full object-cover">
+      </a>
+    </div>
+
+    <div class="kd-finder-viewport relative order-1 min-h-[240px] w-full cursor-grab overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] touch-pan-y select-none sm:min-h-[320px] md:order-2 md:h-auto md:min-h-0 md:w-[70%] xl:rounded-md">
+      <div class="kd-finder-track absolute inset-0 flex transition-transform duration-700 ease-out" style="transform: translateX(0%)">
+        <img src="{% static 'img/head1.png' %}" alt="" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover object-[20%_center]">
+        <img src="{% static 'img/head2.png' %}" alt="" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
+        <img src="{% static 'img/showcase/03.svg' %}" alt="" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
+        <img src="{% static 'img/showcase/05.svg' %}" alt="" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
+      </div>
+
+      <button type="button" class="kd-finder-prev absolute left-2 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn" aria-label="اسلاید قبلی">
+        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <button type="button" class="kd-finder-next absolute right-2 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn" aria-label="اسلاید بعدی">
+        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center bg-gradient-to-t from-black/35 to-transparent pb-4 pt-10">
+        <div class="pointer-events-auto flex items-center gap-1.5" role="tablist" aria-label="اسلایدها">
+          <button type="button" class="kd-finder-dot h-1.5 w-6 rounded-full bg-white transition-all duration-300 ease-out hover:bg-white" data-index="0" aria-label="اسلاید 1"></button>
+          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="1" aria-label="اسلاید 2"></button>
+          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="2" aria-label="اسلاید 3"></button>
+          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="3" aria-label="اسلاید 4"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-3 grid grid-cols-4 gap-2 md:mt-4 md:gap-3" dir="rtl">
+    <a href="{% url 'about' %}#kd-service-delivery" class="group flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-3 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-cyanbtn hover:shadow-md xl:flex-row xl:gap-3 xl:px-4 xl:py-4 xl:text-right">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyanbtn/10 text-cyanbtn transition group-hover:bg-cyanbtn group-hover:text-white md:h-12 md:w-12">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>
+      </span>
+      <span class="min-w-0">
+        <strong class="block text-[11px] font-bold text-slate-800 sm:text-sm">ارسال رایگان</strong>
+        <span class="mt-0.5 hidden text-xs text-slate-500 xl:block">ارسال رایگان سفارش‌های واجد شرایط</span>
+      </span>
+    </a>
+    <a href="{% url 'about' %}#kd-service-warranty" class="group flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-3 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-cyanbtn hover:shadow-md xl:flex-row xl:gap-3 xl:px-4 xl:py-4 xl:text-right">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyanbtn/10 text-cyanbtn transition group-hover:bg-cyanbtn group-hover:text-white md:h-12 md:w-12">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg>
+      </span>
+      <span class="min-w-0">
+        <strong class="block text-[11px] font-bold text-slate-800 sm:text-sm">گارانتی اصالت</strong>
+        <span class="mt-0.5 hidden text-xs text-slate-500 xl:block">ضمانت اصالت کالا و کیفیت فنی</span>
+      </span>
+    </a>
+    <a href="{% url 'about' %}#kd-service-return" class="group flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-3 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-cyanbtn hover:shadow-md xl:flex-row xl:gap-3 xl:px-4 xl:py-4 xl:text-right">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyanbtn/10 text-cyanbtn transition group-hover:bg-cyanbtn group-hover:text-white md:h-12 md:w-12">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h13v10H3z"/><path d="m9 10 2 2 4-4"/></svg>
+      </span>
+      <span class="min-w-0">
+        <strong class="block text-[11px] font-bold text-slate-800 sm:text-sm">۷ روز بازگشت</strong>
+        <span class="mt-0.5 hidden text-xs text-slate-500 xl:block">ضمانت بازگشت کالا تا ۷ روز</span>
+      </span>
+    </a>
+    <a href="{% url 'about' %}#kd-service-support" class="group flex min-w-0 flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-3 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-cyanbtn hover:shadow-md xl:flex-row xl:gap-3 xl:px-4 xl:py-4 xl:text-right">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyanbtn/10 text-cyanbtn transition group-hover:bg-cyanbtn group-hover:text-white md:h-12 md:w-12">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v-3a2 2 0 0 0-2-2h-1"/><path d="M2 16.9V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8.9"/><path d="M6 19a2 2 0 0 0 4 0M14 19a2 2 0 0 0 4 0"/></svg>
+      </span>
+      <span class="min-w-0">
+        <strong class="block text-[11px] font-bold text-slate-800 sm:text-sm">مشاوره رایگان</strong>
+        <span class="mt-0.5 hidden text-xs text-slate-500 xl:block">پشتیبانی و مشاوره پیش از خرید</span>
+      </span>
+    </a>
+  </div>
+</div>

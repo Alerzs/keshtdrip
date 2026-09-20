@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}کشت‌دریپ | فروشگاه اینترنتی{% endblock %}
+{% block content %}
+<section class="flex flex-col gap-y-4 py-4 lg:gap-y-8">
+  <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
+    {% include "shop/_finder.html" %}
+  </section>
+
+  {% include "shop/_rail.html" with products=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
+
+  {% include "shop/_showcase.html" %}
+
+  {% if categories %}
+  <div class="mx-auto grid w-full max-w-[1440px] grid-cols-6 gap-2 overflow-hidden px-4 md:gap-4 xl:px-20">
+    {% for cat in categories|slice:":5" %}
+      <a href="{{ cat.get_absolute_url }}" class="{% cycle 'col-span-3' 'col-span-3' 'col-span-2' 'col-span-2' 'col-span-2' %} group block overflow-hidden rounded-xl transition duration-300 ease-out hover:opacity-90">
+        {% include "shop/_media.html" with file=cat.image alt=cat.name label=cat.name size="category" %}
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% include "shop/_rail.html" with products=fresh title="همه محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=drips title="محصولات آبیاری" more_url="/shop/?category=irrigation/" %}
+  {% include "shop/_rail.html" with products=joints title="اتصالات" more_url="/shop/?category=joints" %}
+  {% if blog_posts %}
+    {% include "shop/_blog_special.html" %}
+  {% endif %}
+  <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
+    {% include "shop/_finder_panel.html" %}
+  </section>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  var root = document.getElementById('kd-finder');
+  if (root) {
+    var track = root.querySelector('.kd-finder-track');
+    var slides = track ? track.children.length : 0;
+    var dots = root.querySelectorAll('.kd-finder-dot');
+    var index = 0;
+    var timer;
+    function go(n) {
+      if (!slides) return;
+      index = (n + slides) % slides;
+      track.style.transform = 'translateX(' + (-index * 100) + '%)';
+      for (var i = 0; i < dots.length; i++) {
+        var on = i === index;
+        dots[i].classList.toggle('bg-white', on);
+        dots[i].classList.toggle('w-6', on);
+        dots[i].classList.toggle('bg-white/45', !on);
+        dots[i].classList.toggle('w-1.5', !on);
+      }
+    }
+    function start() {
+      stop();
+      if (slides < 2) return;
+      timer = setInterval(function () { go(index + 1); }, 5000);
+    }
+    function stop() { if (timer) clearInterval(timer); }
+    root.querySelector('.kd-finder-prev')?.addEventListener('click', function (e) { e.preventDefault(); go(index - 1); start(); });
+    root.querySelector('.kd-finder-next')?.addEventListener('click', function (e) { e.preventDefault(); go(index + 1); start(); });
+    for (var d = 0; d < dots.length; d++) {
+      dots[d].addEventListener('click', function (e) {
+        e.preventDefault();
+        go(parseInt(this.getAttribute('data-index'), 10));
+        start();
+      });
+    }
+    var viewport = root.querySelector('.kd-finder-viewport') || track.parentElement;
+    var dragging = false;
+    var dragLock = null;
+    var startX = 0;
+    var startY = 0;
+    var lastX = 0;
+    var dragThreshold = 48;
+    function setDragOffset(px) {
+      track.style.transform = 'translateX(calc(' + (-index * 100) + '% + ' + px + 'px))';
+    }
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      dragLock = null;
+      viewport.classList.remove('cursor-grabbing');
+      viewport.classList.add('cursor-grab');
+      var dx = (e && typeof e.clientX === 'number' ? e.clientX : lastX) - startX;
+      track.style.transition = '';
+      if (dx < -dragThreshold) go(index + 1);
+      else if (dx > dragThreshold) go(index - 1);
+      else go(index);
+      start();
+    }
+    viewport.addEventListener('pointerdown', function (e) {
+      if (!slides || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      if (e.target.closest('button')) return;
+      dragging = true;
+      dragLock = null;
+      startX = lastX = e.clientX;
+      startY = e.clientY;
+      stop();
+      track.style.transition = 'none';
+      viewport.classList.remove('cursor-grab');
+      viewport.classList.add('cursor-grabbing');
+      try { viewport.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    viewport.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (!dragLock) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        dragLock = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        if (dragLock === 'v') {
+          dragging = false;
+          viewport.classList.remove('cursor-grabbing');
+          viewport.classList.add('cursor-grab');
+          track.style.transition = '';
+          go(index);
+          start();
+          return;
+        }
+      }
+      if (dragLock !== 'h') return;
+      e.preventDefault();
+      lastX = e.clientX;
+      setDragOffset(dx);
+    });
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+    root.addEventListener('mouseenter', function () { if (!dragging) stop(); });
+    root.addEventListener('mouseleave', function () { if (!dragging) start(); });
+    start();
+  }
+})();
+(function(){
+  var root = document.getElementById('kd-showcase');
+  if (root) {
+    var track = root.querySelector('.kd-showcase-track');
+    var slides = track ? track.children.length : 0;
+    var dots = root.querySelectorAll('.kd-showcase-dot');
+    var index = 0;
+    var timer;
+    function go(n) {
+      if (!slides) return;
+      index = (n + slides) % slides;
+      track.style.transform = 'translateX(' + (-index * 100) + '%)';
+      for (var i = 0; i < dots.length; i++) {
+        dots[i].classList.toggle('bg-white', i === index);
+        dots[i].classList.toggle('bg-white/50', i !== index);
+      }
+    }
+    function start() {
+      stop();
+      if (slides < 2) return;
+      timer = setInterval(function () { go(index + 1); }, 4500);
+    }
+    function stop() { if (timer) clearInterval(timer); }
+    root.querySelector('.kd-showcase-prev')?.addEventListener('click', function (e) { e.preventDefault(); go(index - 1); start(); });
+    root.querySelector('.kd-showcase-next')?.addEventListener('click', function (e) { e.preventDefault(); go(index + 1); start(); });
+    for (var d = 0; d < dots.length; d++) {
+      dots[d].addEventListener('click', function (e) {
+        e.preventDefault();
+        go(parseInt(this.getAttribute('data-index'), 10));
+        start();
+      });
+    }
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    start();
+  }
+})();
+(function(){
+  var root = document.getElementById('kd-blog-special');
+  if (!root) return;
+  var slides = root.querySelectorAll('.kd-blog-slide');
+  var dots = root.querySelectorAll('.kd-blog-dot');
+  var thumbs = root.querySelectorAll('.kd-blog-thumb');
+  var index = 0;
+  function go(n) {
+    if (!slides.length) return;
+    index = (n + slides.length) % slides.length;
+    for (var i = 0; i < slides.length; i++) {
+      slides[i].classList.toggle('hidden', i !== index);
+    }
+    for (var i = 0; i < dots.length; i++) {
+      var on = i === index;
+      dots[i].classList.toggle('bg-cyanbtn', on);
+      dots[i].classList.toggle('w-5', on);
+      dots[i].classList.toggle('bg-slate-300', !on);
+      dots[i].classList.toggle('w-2', !on);
+    }
+    for (var t = 0; t < thumbs.length; t++) {
+      var onThumb = t === index;
+      thumbs[t].classList.toggle('bg-header', onThumb);
+      thumbs[t].classList.toggle('border-s-cyanbtn', onThumb);
+      thumbs[t].classList.toggle('border-s-transparent', !onThumb);
+    }
+  }
+  for (var d = 0; d < dots.length; d++) {
+    dots[d].addEventListener('click', function (e) {
+      e.preventDefault();
+      go(parseInt(this.getAttribute('data-index'), 10));
+    });
+  }
+  for (var th = 0; th < thumbs.length; th++) {
+    thumbs[th].addEventListener('click', function (e) {
+      e.preventDefault();
+      go(parseInt(this.getAttribute('data-index'), 10));
+    });
+  }
+})();
+(function(){
+  var w = document.getElementById('kd-main-module');
+  if(!w) return;
+  var catalogUrl = "{% url 'catalog' %}";
+  var d = {
+    tape: [
+      {k:'type', n:'نوع', o:['همه', 'پلاکدار', 'درزدار']},
+      {k:'distance', n:'فاصله', o:['همه', {l:'۱۰ سانتی', v:'سایز ۱۰'}, {l:'۲۰ سانتی', v:'سایز ۲۰'}, {l:'۳۰ سانتی', v:'سایز ۳۰'}]},
+      {k:'thickness', n:'ضخامت', o:['همه', {l:'۶ میل', v:'ضخامت ۶ میل'}, {l:'۷ میل', v:'ضخامت ۷ میل'}, {l:'۸ میل', v:'ضخامت ۸ میل'}]},
+      {k:'length', n:'متراژ', o:['همه', '۱۰۰۰ متر']},
+      {k:'brand', n:'برند', o:['همه برندها', {l:'کشت‌دریپ', v:'کشت دریپ'}, 'رهاورد', 'پارس', 'یورودریپ']}
+    ],
+    pe: [
+      {k:'size', n:'سایز', o:['همه', {l:'۱۶ میلیمتر', v:'سایز ۱۶'}, {l:'۲۰ میلیمتر', v:'سایز ۲۰'}, {l:'۳۲ میلیمتر', v:'سایز ۳۲'}]},
+      {k:'pressure', n:'فشار کار', o:['همه', 'استاندارد', '۴ اتمسفر', '۶ اتمسفر']},
+      {k:'length', n:'متراژ کلاف', o:['همه', {l:'۱۰۰ متر', v:'کلاف ۱۰۰ متر'}, {l:'۲۰۰ متر', v:'کلاف ۲۰۰ متر'}, {l:'۴۰۰ متر', v:'کلاف ۴۰۰ متر'}]},
+      {k:'brand', n:'برند', o:['همه برندها', {l:'کشت‌دریپ', v:'کشت دریپ'}, 'پلی ران', 'تکاب']}
+    ],
+    layflat: [
+      {k:'size', n:'سایز', o:['همه', '۱ اینچ', '۱/۵ اینچ', '۲ اینچ', '۳ اینچ', '۴ اینچ', '۶ اینچ']},
+      {k:'pressure', n:'فشار کار', o:['همه', '۲ بار', '۴ بار', '۶ بار']},
+      {k:'length', n:'متراژ کلاف', o:['همه', {l:'۵۰ متر', v:'کلاف ۵۰ متر'}, {l:'۱۰۰ متر', v:'کلاف ۱۰۰ متر'}]},
+      {k:'brand', n:'برند', o:['همه برندها', {l:'کشت‌دریپ', v:'کشت دریپ'}]}
+    ],
+    fittings: [{k:'type',n:'نوع اتصال',o:['همه','رابط تیپ','زانو','سه راهی','شیر انشعاب']},{k:'size',n:'سایز',o:['همه','۱۶*۱۶','۱/۲ اینچ','۳/۴ اینچ']},{k:'brand',n:'برند',o:['همه برندها',{l:'کشت‌دریپ', v:'کشت دریپ'}]}],
+    dripper: [{k:'type',n:'نوع',o:['همه','تنظیم شونده','دبی ثابت (PC)']},{k:'flow',n:'دبی خروجی',o:['همه','۴ لیتر','۸ لیتر','۲۴ لیتر']},{k:'brand',n:'برند',o:['همه برندها',{l:'کشت‌دریپ', v:'کشت دریپ'},'نتافیم','یورودریپ','ایریپلاست']}],
+    filter: [{k:'type',n:'نوع فیلتر',o:['همه','دیسکی','توری','هیدروسیکلون']},{k:'size',n:'سایز',o:['همه','۱ اینچ','۲ اینچ','۳ اینچ']},{k:'brand',n:'برند',o:['همه برندها',{l:'کشت‌دریپ', v:'کشت دریپ'},'آزود','آمیاد']}]
+  };
+  var dropCls = 'group relative w-full flex-none md:min-w-[130px] md:flex-1';
+  var btnCls = 'flex h-full min-h-[42px] w-full cursor-pointer select-none items-center justify-between rounded-full border border-slate-300 bg-white px-[15px] py-2.5 text-[0.85rem] text-[#444] transition-all duration-200 hover:border-cyanbtn hover:shadow-[0_0_0_3px_rgba(102,187,106,0.1)] group-[.active]:border-cyanbtn group-[.active]:shadow-[0_0_0_3px_rgba(102,187,106,0.1)]';
+  var menuCls = 'invisible absolute right-0 top-[calc(100%+8px)] z-[1000] m-0 max-h-[200px] w-full min-w-[130px] list-none overflow-y-auto rounded-xl bg-white p-2 opacity-0 shadow-[0_8px_25px_rgba(0,0,0,0.15)] transition-all duration-300 -translate-y-2.5 group-[.active]:visible group-[.active]:translate-y-0 group-[.active]:opacity-100';
+  var itemCls = 'mb-0.5 cursor-pointer rounded-lg px-3 py-2 text-[0.85rem] text-[#333] last:mb-0 hover:bg-cyanbtn hover:text-white';
+  var c = w.querySelector('#kd-dynamic-filters-container');
+  var r = w.querySelectorAll('input[name="kd_type"]');
+  var chevron = '<svg class="mr-2 h-3 w-3 shrink-0 fill-[#888] transition-transform duration-300 group-[.active]:rotate-180" viewBox="0 0 320 512"><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>';
+
+  function b(v){
+    if(!c || !d[v]) return;
+    var h = '';
+    for(var i=0; i<d[v].length; i++){
+      var f = d[v][i];
+      var l_html = '';
+      for(var j=0; j<f.o.length; j++){
+        var opt = f.o[j];
+        var lbl = opt.l || opt;
+        var val = opt.v !== undefined ? opt.v : (lbl.indexOf('همه') === 0 ? '' : lbl);
+        l_html += '<li class="'+itemCls+'" data-val="'+val+'">'+lbl+'</li>';
+      }
+      var extra = (i === d[v].length - 1 && d[v].length % 2 === 1) ? ' max-md:col-span-2' : '';
+      h += '<div class="'+dropCls+extra+'"><div class="kd-drop-btn '+btnCls+'"><span class="kd-text flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-right" data-val="">'+f.n+' ...</span>'+chevron+'</div><ul class="kd-drop-menu '+menuCls+'">'+l_html+'</ul></div>';
+    }
+    c.innerHTML = h;
+  }
+
+  for(var k=0; k<r.length; k++){ r[k].addEventListener('change', function(e){ if(e.target.checked) b(e.target.value); }); }
+
+  w.addEventListener('click', function(e){
+    var bt = e.target.closest('.kd-drop-btn');
+    if(bt){
+      var cd = bt.closest('.group');
+      var ad = w.querySelectorAll('#kd-dynamic-filters-container > .group');
+      for(var m=0; m<ad.length; m++){ if(ad[m]!==cd) ad[m].classList.remove('active'); }
+      cd.classList.toggle('active');
+      e.stopPropagation();
+      return;
+    }
+    var li = e.target.closest('.kd-drop-menu li');
+    if(li){
+      var dr = li.closest('.group');
+      var txtSpan = dr.querySelector('.kd-text');
+      txtSpan.textContent = li.textContent;
+      txtSpan.setAttribute('data-val', li.getAttribute('data-val'));
+      dr.classList.remove('active');
+      e.stopPropagation();
+      return;
+    }
+    var dds = w.querySelectorAll('#kd-dynamic-filters-container > .group');
+    for(var p=0; p<dds.length; p++){ dds[p].classList.remove('active'); }
+  });
+
+  var ch = w.querySelector('input[name="kd_type"]:checked');
+  if(ch){ b(ch.value); } else { b('tape'); }
+
+  w.querySelector('#kd-search-action').addEventListener('click', function() {
+    var categoryInput = w.querySelector('input[name="kd_type"]:checked');
+    var categoryName = w.querySelector('label[for="' + categoryInput.id + '"]').textContent.trim();
+    var searchQuery = categoryName;
+    w.querySelectorAll('.kd-text').forEach(function(span) {
+      var val = span.getAttribute('data-val');
+      if (val) searchQuery += ' ' + val;
+    });
+    window.location.href = catalogUrl + '?q=' + encodeURIComponent(searchQuery);
+  });
+})();
+</script>
+{% endblock %}

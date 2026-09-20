@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load persian %}
+{% block title %}{{ product.name }} | کشت‌دریپ{% endblock %}
+{% block content %}
+<article class="mx-auto grid max-w-[1440px] items-start gap-6 px-4 py-8 lg:grid-cols-[minmax(260px,380px)_minmax(0,1fr)_minmax(260px,340px)] xl:gap-8 xl:px-20">
+  <div class="order-1 lg:order-2 lg:col-start-2 lg:hidden">
+    <h1 class="text-xl font-bold leading-8">{{ product.name }}</h1>
+    {% if product.blurb %}
+      <p class="mt-1 text-sm text-slate-500">{{ product.blurb }}</p>
+    {% endif %}
+  </div>
+
+  <div class="order-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_12px_40px_rgba(15,23,42,0.06)] md:p-4 lg:order-1 lg:top-28">
+    <figure id="kd-zoom" class="relative mx-auto m-0 w-fit max-w-full overflow-hidden rounded-xl bg-gradient-to-b from-slate-50 to-white">
+      {% if gallery %}
+        <img id="kd-main-image" src="{{ gallery.0.url }}" alt="{{ gallery.0.alt }}" class="block h-auto max-h-[280px] w-auto max-w-full cursor-zoom-in object-contain sm:max-h-[320px] md:max-h-[340px]">
+      {% else %}
+        <span class="grid min-h-[240px] place-items-center px-3 text-center text-sm text-slate-500">محل تصویر محصول</span>
+      {% endif %}
+    </figure>
+    {% if gallery|length > 1 %}
+      <div class="mt-3 flex gap-2 overflow-x-auto pb-1" role="list" aria-label="تصاویر محصول">
+        {% for item in gallery %}
+          <button type="button" role="listitem" data-kd-thumb data-src="{{ item.url }}" data-alt="{{ item.alt }}" class="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl border-2 bg-slate-50 transition hover:border-cyanbtn {% if forloop.first %}border-cyanbtn ring-2 ring-cyanbtn/20{% else %}border-slate-200{% endif %}">
+            <img src="{{ item.url }}" alt="{{ item.alt }}" class="absolute inset-0 h-full w-full object-cover">
+          </button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="order-3 lg:order-2">
+    <div class="hidden lg:block">
+      <h1 class="text-2xl font-bold leading-9 md:text-[28px]">{{ product.name }}</h1>
+      {% if product.blurb %}
+        <p class="mt-1 text-sm text-slate-500">{{ product.blurb }}</p>
+      {% endif %}
+    </div>
+
+    <div class="mt-4 text-sm text-slate-600">
+      <p>کد کالا : <span class="inline-block font-semibold text-slate-800" dir="ltr">{{ product.slug }}</span></p>
+      <div class="mt-3 space-y-2">
+        <p>دسته : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></p>
+        <p>برند : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></p>
+        <p>مشاهده انواع <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}{% if product.brand %}&brand={{ product.brand.slug }}{% endif %}">{{ product.category.name }}{% if product.brand %} {{ product.brand.name }}{% endif %}</a></p>
+      </div>
+    </div>
+
+    {% with spec_lines=product.description|as_lines %}
+      {% if spec_lines %}
+        <div class="mt-6">
+          <h2 class="mb-3 text-base font-bold">مشخصات محصول</h2>
+          <div id="kd-specs" class="relative max-h-44 overflow-hidden" data-kd-specs>
+            <ul class="list-disc space-y-1.5 pr-5 text-sm leading-7 text-slate-600">
+              {% for line in spec_lines %}
+                <li>{{ line }}</li>
+              {% endfor %}
+            </ul>
+            <div id="kd-specs-fade" class="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#f7fff8]"></div>
+          </div>
+          <button type="button" id="kd-specs-more" class="mt-2 text-sm font-semibold text-cyanbtn transition hover:text-cyanbtnHover">بیشتر..</button>
+          <button type="button" id="kd-specs-less" class="mt-2 hidden text-sm font-semibold text-cyanbtn transition hover:text-cyanbtnHover">کمتر..</button>
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <form class="order-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] lg:top-28" method="post" action="{% url 'add_to_cart' product.slug %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'cart' %}">
+    <p class="text-2xl font-bold text-slate-900">{{ product.price|fa_num }} <span class="text-base font-semibold text-slate-500">تومان</span></p>
+    <p class="mt-1 text-sm text-slate-500">واحد فروش: {{ product.unit }}</p>
+    {% if product.stock <= 5 %}
+      <p class="mt-4 text-sm font-semibold text-rose-600">تنها {{ product.stock|fa_num }} عدد در انبار باقی مانده</p>
+    {% else %}
+      <p class="mt-4 text-sm text-slate-500">موجود در انبار</p>
+    {% endif %}
+    <div class="mt-4 flex flex-col gap-3">
+      <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+        تعداد
+        <span class="inline-flex h-12 w-full items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+          <button type="button" id="kd-qty-minus" class="grid h-12 w-11 place-items-center text-lg text-slate-600 transition hover:bg-white hover:text-cyanbtn" aria-label="کاهش تعداد">−</button>
+          <input id="kd-qty-input" class="h-12 min-w-0 flex-1 border-x border-slate-200 bg-white text-center text-base font-bold outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" type="number" name="quantity" min="1" max="{{ product.stock }}" value="1">
+          <button type="button" id="kd-qty-plus" class="grid h-12 w-11 place-items-center text-lg text-slate-600 transition hover:bg-white hover:text-cyanbtn" aria-label="افزایش تعداد">+</button>
+        </span>
+      </label>
+      <button class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyanbtn px-6 text-base font-bold text-white shadow-[0_8px_18px_rgba(67,160,71,0.28)] transition hover:bg-cyanbtnHover hover:shadow-[0_10px_22px_rgba(67,160,71,0.35)]" type="submit">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h2l1.2 9.2a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L20 8H7"/><circle cx="9" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>
+        افزودن به سبد خرید
+      </button>
+    </div>
+  </form>
+</article>
+{% if related %}
+  {% include "shop/_rail.html" with products=related title="محصولات مرتبط" more_url=product.category.get_absolute_url %}
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+  (function () {
+    var main = document.getElementById("kd-main-image");
+    var frame = document.getElementById("kd-zoom");
+    var thumbs = document.querySelectorAll("[data-kd-thumb]");
+
+    function resetZoom() {
+      if (!main) return;
+      main.style.transform = "scale(1)";
+      main.style.transformOrigin = "center center";
+    }
+    function zoomAt(e) {
+      if (!main || !frame) return;
+      var rect = frame.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      main.style.transformOrigin = x + "% " + y + "%";
+      main.style.transform = "scale(2)";
+    }
+    if (frame && main) {
+      frame.addEventListener("mousemove", zoomAt);
+      frame.addEventListener("mouseenter", zoomAt);
+      frame.addEventListener("mouseleave", resetZoom);
+    }
+
+    thumbs.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (!main) return;
+        resetZoom();
+        main.src = btn.getAttribute("data-src");
+        main.alt = btn.getAttribute("data-alt") || "";
+        thumbs.forEach(function (item) {
+          item.classList.remove("border-cyanbtn", "ring-2", "ring-cyanbtn/20");
+          item.classList.add("border-slate-200");
+        });
+        btn.classList.add("border-cyanbtn", "ring-2", "ring-cyanbtn/20");
+        btn.classList.remove("border-slate-200");
+      });
+    });
+
+    var input = document.getElementById("kd-qty-input");
+    var minus = document.getElementById("kd-qty-minus");
+    var plus = document.getElementById("kd-qty-plus");
+    function clampQty() {
+      if (!input) return;
+      var min = Number(input.min || 1);
+      var max = Number(input.max || 99);
+      var value = Number(input.value || min);
+      if (Number.isNaN(value)) value = min;
+      input.value = Math.min(max, Math.max(min, value));
+    }
+    minus?.addEventListener("click", function () {
+      input.value = Number(input.value || 1) - 1;
+      clampQty();
+    });
+    plus?.addEventListener("click", function () {
+      input.value = Number(input.value || 1) + 1;
+      clampQty();
+    });
+    input?.addEventListener("change", clampQty);
+
+    var specs = document.getElementById("kd-specs");
+    var moreBtn = document.getElementById("kd-specs-more");
+    var lessBtn = document.getElementById("kd-specs-less");
+    var fade = document.getElementById("kd-specs-fade");
+    function setSpecsOpen(open) {
+      if (!specs) return;
+      specs.classList.toggle("max-h-44", !open);
+      specs.classList.toggle("overflow-hidden", !open);
+      fade?.classList.toggle("hidden", open);
+      moreBtn?.classList.toggle("hidden", open);
+      lessBtn?.classList.toggle("hidden", !open);
+    }
+    if (specs && specs.scrollHeight <= specs.clientHeight + 8) {
+      setSpecsOpen(true);
+      moreBtn?.classList.add("hidden");
+      lessBtn?.classList.add("hidden");
+    } else {
+      moreBtn?.addEventListener("click", function () { setSpecsOpen(true); });
+      lessBtn?.addEventListener("click", function () { setSpecsOpen(false); });
+    }
+  })();
+</script>
+{% endblock %}

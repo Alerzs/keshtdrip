@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}درباره مجموعه | کشت‌دریپ{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
+  {% include "shop/_media.html" with file=None alt="" label="محل تصویر مجموعه یا انبار" size="wide" %}
+  <h1 class="mb-3 text-2xl font-bold">تولیدکننده و تأمین‌کننده نهاده کشاورزی.</h1>
+  <p class="mb-8 max-w-3xl leading-8 text-slate-600">کشت‌دریپ از کار روی سامانه آبیاری قطره‌ای آغاز شد و امروز بذر، بستر کشت، ابزار و ملزومات باغداری را برای بهره‌برداران حرفه‌ای فراهم می‌کند. هدف ما ظاهر فروشگاهی نیست؛ کیفیت کالا و شفافیت مشخصات فنی است.</p>
+  <div class="grid gap-4 md:grid-cols-3">
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">کشت</h3>
+      <p class="text-slate-500">تجربه زراعت، باغداری و گلخانه؛ انتخاب محصول بر اساس نیاز واقعی مزرعه.</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">دریپ</h3>
+      <p class="text-slate-500">مدیریت آب در محل ریشه، کاهش هدررفت و افزایش یکنواختی آبیاری.</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">مشاوره</h3>
+      <p class="text-slate-500">از مشاوره رایگان پیش از خرید تا ارسال سریع به سراسر کشور.</p>
+    </article>
+  </div>
+  <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <article id="kd-service-delivery" class="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">ارسال رایگان</h3>
+      <p class="text-slate-500">سفارش‌های واجد شرایط بدون هزینه ارسال به سراسر کشور ارسال می‌شوند.</p>
+    </article>
+    <article id="kd-service-warranty" class="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">گارانتی اصالت کالا</h3>
+      <p class="text-slate-500">تمام کالاها با مشخصات فنی شفاف و ضمانت اصالت عرضه می‌شوند.</p>
+    </article>
+    <article id="kd-service-return" class="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">۷ روز ضمانت بازگشت</h3>
+      <p class="text-slate-500">در صورت مغایرت یا مشکل فنی، تا ۷ روز امکان بازگشت کالا وجود دارد.</p>
+    </article>
+    <article id="kd-service-support" class="scroll-mt-28 rounded-xl border border-slate-200 bg-white p-5">
+      <h3 class="mb-2 font-bold">مشاوره رایگان</h3>
+      <p class="text-slate-500">پیش از خرید می‌توانید برای انتخاب سایز، دبی و نوع سامانه مشاوره بگیرید.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}

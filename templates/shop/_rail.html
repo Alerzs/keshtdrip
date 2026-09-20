@@ -1,0 +1,27 @@
+{% if products %}
+<section class="mx-auto w-full max-w-[1440px] rounded-xl bg-rail px-4 pb-6 xl:px-6">
+  <div class="flex items-center justify-between py-4">
+    <h3 class="border-b-2 border-sky-400 pb-1 font-semibold text-slate-800">{{ title }}</h3>
+    <a class="text-sm font-medium text-slate-700 transition-colors duration-200 hover:text-cyanbtn" href="{{ more_url }}">مشاهده همه</a>
+  </div>
+  <div class="kd-rail relative">
+    <button type="button" class="kd-rail-prev invisible pointer-events-none absolute left-1 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-slate-700 shadow-[0_4px_14px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1/2 hover:scale-110 hover:bg-white hover:text-cyanbtn" aria-label="اسکرول به چپ">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+    </button>
+    <button type="button" class="kd-rail-next invisible pointer-events-none absolute right-1 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-slate-700 shadow-[0_4px_14px_rgba(15,23,42,0.16)] transition-all duration-300 ease-out hover:-translate-y-1/2 hover:scale-110 hover:bg-white hover:text-cyanbtn" aria-label="اسکرول به راست">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+    <div class="kd-rail-track flex cursor-grab select-none gap-2 overflow-x-auto py-2 [scrollbar-width:none] [-webkit-user-drag:none] [&::-webkit-scrollbar]:hidden [&_img]:pointer-events-none">
+      {% for product in products %}
+        {% include "shop/_card.html" %}
+      {% endfor %}
+      {% if more_url %}
+        <a class="kd-rail-more hidden flex min-h-[280px] w-[150px] shrink-0 items-center justify-center gap-1.5 rounded-xl border border-transparent bg-white p-4 text-lg font-semibold text-slate-800 transition duration-200 hover:-translate-y-0.5 hover:border-cyanbtn/40 hover:text-cyanbtn hover:shadow-lg" href="{{ more_url }}">
+          <span class="whitespace-nowrap">مشاهده همه</span>
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}

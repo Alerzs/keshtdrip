@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load persian %}
+{% block title %}سبد خرید | کشت‌دریپ{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
+  <h1 class="mb-6 text-2xl font-bold">سبد خرید</h1>
+  {% if items %}
+    <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,320px)]">
+      <div class="min-w-0">
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <ul class="divide-y divide-slate-100">
+            {% for item in items %}
+              <li class="relative p-4 sm:p-5">
+                <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                  {% csrf_token %}
+                  <button class="absolute left-3 top-3 grid h-9 w-9 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-50 hover:text-rose-600" type="submit" aria-label="حذف از سبد">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+                  </button>
+                </form>
+                <div class="flex items-stretch gap-3 sm:gap-5">
+                  <div class="flex w-[120px] shrink-0 flex-col sm:w-[130px]">
+                    <a class="mb-2 block overflow-hidden rounded-lg bg-slate-50" href="{{ item.product.get_absolute_url }}">
+                      {% include "shop/_media.html" with file=item.product.image alt=item.product.name label="تصویر" size="basket" %}
+                    </a>
+                    <form method="post" action="{% url 'update_cart' item.product.id %}" class="mt-auto" data-kd-qty-form>
+                      {% csrf_token %}
+                      <label class="sr-only" for="qty-{{ item.product.id }}">تعداد</label>
+                      <select id="qty-{{ item.product.id }}" name="quantity" data-kd-qty-select class="h-10 w-full cursor-pointer rounded-[5px] border border-[#eeeeee] bg-white px-2 text-sm text-slate-700 outline-none transition focus:border-slate-500">
+                        {% for qty_value in item.qty_list %}
+                          <option value="{{ qty_value }}" {% if qty_value == item.quantity %}selected{% endif %}>{{ qty_value|fa_num }} {{ item.product.unit }}</option>
+                        {% endfor %}
+                        <option value="custom">وارد کردن مقدار دلخواه</option>
+                      </select>
+                      <input type="number" name="quantity" min="1" max="{{ item.product.stock }}" value="{{ item.quantity }}" data-kd-qty-custom class="mt-2 hidden h-10 w-full rounded-[5px] border border-[#eeeeee] px-2 text-sm outline-none focus:border-slate-500" disabled>
+                    </form>
+                  </div>
+                  <div class="flex min-w-0 flex-1 flex-col pl-8">
+                    <div class="text-[15px] font-medium leading-7 text-slate-800">
+                      <a class="transition hover:text-cyanbtn" href="{{ item.product.get_absolute_url }}" target="_blank">{{ item.product.name }}</a>
+                    </div>
+                    <div class="mt-1 text-xs text-slate-500">کد کالا : <span dir="ltr">{{ item.product.slug }}</span></div>
+                    <div class="mt-auto space-y-1.5 pt-6 text-sm">
+                      <div class="flex flex-wrap items-baseline gap-x-2">
+                        <span class="text-slate-500">قیمت کل:</span>
+                        <span class="font-bold text-slate-900">{{ item.line_total|fa_num }} <span class="text-xs font-semibold text-slate-500">تومان</span></span>
+                      </div>
+                      <div class="flex flex-wrap items-baseline gap-x-2">
+                        <span class="text-slate-500">قیمت واحد</span>
+                        <span class="font-semibold text-slate-800">{{ item.product.price|fa_num }} <span class="text-xs font-medium text-slate-500">تومان</span></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <aside class="lg:sticky lg:top-28">
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <ul class="divide-y divide-slate-100 text-sm">
+            <li class="flex items-center justify-between gap-3 px-4 py-3.5">
+              <span class="text-slate-600">قیمت کالاها ({{ item_count|fa_num }} کالا)</span>
+              <span class="font-semibold">{{ total|fa_num }} <span class="text-xs font-medium text-slate-500">تومان</span></span>
+            </li>
+            <li class="flex items-center justify-between gap-3 px-4 py-3.5">
+              <span class="text-slate-600">تخفیف کالاها</span>
+              <span class="font-semibold text-rose-600">{{ 0|fa_num }} <span class="text-xs font-medium">تومان</span></span>
+            </li>
+            <li class="flex items-center justify-between gap-3 px-4 py-3.5">
+              <span class="text-slate-600">جمع خرید</span>
+              <span class="font-semibold">{{ total|fa_num }} <span class="text-xs font-medium text-slate-500">تومان</span></span>
+            </li>
+            <li class="flex items-center justify-between gap-3 px-4 py-4">
+              <span class="font-bold text-slate-800">مبلغ قابل پرداخت</span>
+              <span class="text-base font-bold text-slate-900">{{ total|fa_num }} <span class="text-xs font-semibold text-slate-500">تومان</span></span>
+            </li>
+            <li class="hidden px-4 pb-3 pt-1 lg:block">
+              <a class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyanbtn text-base font-bold text-white shadow-[0_8px_18px_rgba(67,160,71,0.28)] transition hover:bg-cyanbtnHover" href="{% if user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'account' %}?next={% url 'checkout' %}{% endif %}">
+                ادامه خرید
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h2l1.2 9.2a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L20 8H7"/><circle cx="9" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>
+              </a>
+            </li>
+            <li class="hidden px-4 pb-4 lg:block">
+              <a class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-sky-400 bg-white text-base font-bold text-sky-600 transition hover:bg-sky-50" href="{% url 'catalog' %}">
+                بازگشت به فروشگاه
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 6h14M5 12h10M5 18h14"/></svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <p class="mt-2 rounded-lg bg-[#e8f4fd] p-2 text-right text-xs leading-6 text-sky-800">کالاهای موجود در سبد کالای شما هنوز ثبت و رزرو نشده است، برای ثبت سفارش مراحل بعدی را تکمیل کنید</p>
+      </aside>
+    </div>
+
+    {% include "shop/_cart_featured.html" %}
+    <div class="h-20 lg:hidden"></div>
+    <div class="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 p-3 backdrop-blur lg:hidden">
+      <div class="mx-auto flex max-w-[1440px] items-center gap-3">
+        <div class="min-w-0 grow text-right text-sm">
+          <span class="block text-xs text-slate-500">مبلغ قابل پرداخت</span>
+          <strong class="text-base">{{ total|fa_num }} تومان</strong>
+        </div>
+        <a class="inline-flex h-12 min-w-[160px] items-center justify-center rounded-xl bg-cyanbtn px-5 font-bold text-white hover:bg-cyanbtnHover" href="{% if user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'account' %}?next={% url 'checkout' %}{% endif %}">ادامه خرید</a>
+      </div>
+    </div>
+  {% else %}
+    <div class="rounded-xl border border-slate-200 bg-white p-8 text-center">
+      <p class="mb-5 text-slate-500">سبد خرید خالی است.</p>
+      <a class="inline-flex rounded-full bg-cyanbtn px-8 py-3 font-bold text-white hover:bg-cyanbtnHover" href="{% url 'catalog' %}">بازگشت به فروشگاه</a>
+    </div>
+    {% include "shop/_cart_featured.html" %}
+  {% endif %}
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+  (function () {
+    document.querySelectorAll("[data-kd-qty-form]").forEach(function (form) {
+      var select = form.querySelector("[data-kd-qty-select]");
+      var custom = form.querySelector("[data-kd-qty-custom]");
+      if (!select || !custom) return;
+      select.addEventListener("change", function () {
+        if (select.value === "custom") {
+          select.removeAttribute("name");
+          custom.disabled = false;
+          custom.classList.remove("hidden");
+          custom.focus();
+          custom.select();
+          return;
+        }
+        custom.disabled = true;
+        form.submit();
+      });
+      custom.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          form.submit();
+        }
+      });
+      custom.addEventListener("blur", function () {
+        if (!custom.disabled && custom.value) form.submit();
+      });
+    });
+  })();
+</script>
+{% endblock %}

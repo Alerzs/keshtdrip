@@ -1,0 +1,36 @@
+{% load static %}
+{% if showcase %}
+<section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20" aria-label="ویترین دسته‌ها">
+  <div id="kd-showcase" class="relative overflow-hidden rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.12)]" dir="ltr">
+    <div class="kd-showcase-track flex transition-transform duration-500 ease-out" style="transform: translateX(0%)">
+      {% for slide in showcase %}
+        <a href="{{ slide.category.get_absolute_url }}" class="relative min-h-[200px] w-full min-w-full shrink-0 sm:min-h-[280px] md:min-h-[360px]" aria-label="{{ slide.category.name }}">
+          <img src="{{ slide.image_url }}" alt="{{ slide.category.name }}" class="absolute inset-0 h-full w-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 z-10 p-5 pr-16 text-right text-white sm:p-8 sm:pr-20" dir="rtl">
+            <p class="text-xs font-medium text-cyan-200 sm:text-sm">دسته‌بندی</p>
+            <strong class="mt-1 block text-xl font-bold sm:text-3xl">{{ slide.category.name }}</strong>
+            {% if slide.category.tagline %}
+              <p class="mt-2 max-w-xl text-sm text-white/85 sm:text-base">{{ slide.category.tagline }}</p>
+            {% endif %}
+            <span class="mt-4 inline-flex items-center gap-2 rounded-full bg-cyanbtn px-4 py-2 text-sm font-bold text-white">مشاهده محصولات</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% if showcase|length > 1 %}
+      <button type="button" class="kd-showcase-prev absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-slate-800 shadow hover:bg-white" aria-label="اسلاید قبلی">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <button type="button" class="kd-showcase-next absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-slate-800 shadow hover:bg-white" aria-label="اسلاید بعدی">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+      <div class="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+        {% for slide in showcase %}
+          <button type="button" class="kd-showcase-dot h-2.5 w-2.5 rounded-full {% if forloop.first %}bg-white{% else %}bg-white/50{% endif %}" data-index="{{ forloop.counter0 }}" aria-label="اسلاید {{ forloop.counter }}"></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
