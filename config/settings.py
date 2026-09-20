@@ -15,7 +15,7 @@ def env_list(name, default=""):
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.environ["django-secret-key"]
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
