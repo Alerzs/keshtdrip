@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@source "../../templates/**/*.html";
+@source not "../css/output.css";
+
+@theme {
+  --font-sans: "Vazirmatn", "Tahoma", "Arial", sans-serif;
+  --color-header: #f1fdf4;
+  --color-rail: #d8f5e3;
+  --color-cyanbtn: #66bb6a;
+  --color-cyanbtnHover: #43a047;
+}
