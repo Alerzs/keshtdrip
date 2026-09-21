@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-@source "../../templates/**/*.html";
-@source not "../css/output.css";
+@source "../templates/**/*.html";
+@source not "../static/css/output.css";
 
 @theme {
   --font-sans: "Vazirmatn", "Tahoma", "Arial", sans-serif;
