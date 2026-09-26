@@ -62,7 +62,6 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 staticfiles/
-media/
 
 # Node / Tailwind
 node_modules/
