@@ -23,9 +23,9 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").replace(";", ",").split(",")
     if origin.strip()
 ]
-site_url = os.environ.get("SITE_URL", "").strip().rstrip("/")
-if site_url and site_url not in CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS.append(site_url)
+SITE_URL = os.environ.get("SITE_URL", "").strip().rstrip("/")
+if SITE_URL and SITE_URL not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(SITE_URL)
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

@@ -1,12 +1,17 @@
 {% extends "base.html" %}
-{% block title %}کشت‌دریپ | فروشگاه اینترنتی{% endblock %}
 {% block content %}
 <section class="flex flex-col gap-y-4 py-4 lg:gap-y-8">
   <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
     {% include "shop/_finder.html" %}
   </section>
 
+  <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
+    <h1 class="text-xl font-bold text-slate-900 md:text-2xl">خرید نوار تیپ و لوازم آبیاری</h1>
+    <p class="mt-2 max-w-3xl text-sm leading-7 text-slate-600">کشت‌دریپ فروشگاه نوار تیپ و تجهیزات آبیاری قطره‌ای است. برای خرید نوار تیپ و خرید لوازم آبیاری، مشخصات فنی هر کالا را ببینید و سفارش را آنلاین ثبت کنید.</p>
+  </section>
+
   {% include "shop/_rail.html" with products=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=tapes title="نوار تیپ" more_url="/shop/?category=drip-tape" %}
 
   {% include "shop/_showcase.html" %}
 
@@ -26,6 +31,24 @@
   {% if blog_posts %}
     {% include "shop/_blog_special.html" %}
   {% endif %}
+
+  <section class="mx-auto grid w-full max-w-[1440px] gap-4 px-4 md:grid-cols-3 xl:px-20">
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h2 class="mb-2 text-lg font-bold">خرید نوار تیپ</h2>
+      <p class="mb-4 text-sm leading-7 text-slate-600">نوار تیپ پلاکدار و درزدار برای آبیاری ردیفی، در فاصله و ضخامت‌های رایج. رول را با طول خط و فاصله بوته انتخاب کنید.</p>
+      <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'catalog' %}?category=drip-tape">مشاهده نوار تیپ</a>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h2 class="mb-2 text-lg font-bold">خرید لوازم آبیاری</h2>
+      <p class="mb-4 text-sm leading-7 text-slate-600">لوله پلی‌اتیلن، لوله نخدار، فیلتر و اتصالات کنار نوار تیپ، قطعات یک سامانه قطره‌ای را کامل می‌کنند.</p>
+      <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'catalog' %}">ورود به فروشگاه</a>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5">
+      <h2 class="mb-2 text-lg font-bold">راهنمای انتخاب نوار تیپ</h2>
+      <p class="mb-4 text-sm leading-7 text-slate-600">فاصله قطره‌چکان، ضخامت دیواره و تفاوت پلاکدار با درزدار را قبل از خرید نوار تیپ بررسی کنید.</p>
+      <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'how-to-choose-drip-tape' %}">مطالعه راهنما</a>
+    </article>
+  </section>
 </section>
 {% endblock %}
 

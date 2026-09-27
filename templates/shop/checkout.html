@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load persian %}
-{% block title %}ثبت سفارش | کشت‌دریپ{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
   <h1 class="mb-6 text-2xl font-bold">اطلاعات گیرنده</h1>
@@ -23,7 +22,7 @@
       <ul class="grid gap-2">
         {% for item in items %}
           <li class="flex justify-between gap-3 text-sm">
-            <span>{{ item.quantity|fa_num }} × {{ item.product.name }}</span>
+            <span>{{ item.quantity|fa_num }} × {{ item.product.name }}{% if item.variant %} ({{ item.variant.spec_label|fa_num }}){% endif %}</span>
             <strong>{{ item.line_total|fa_num }} تومان</strong>
           </li>
         {% endfor %}

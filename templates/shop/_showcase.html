@@ -8,10 +8,9 @@
           <img src="{{ slide.image_url }}" alt="{{ slide.category.name }}" class="absolute inset-0 h-full w-full object-cover">
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
           <div class="absolute inset-x-0 bottom-0 z-10 p-5 pr-16 text-right text-white sm:p-8 sm:pr-20" dir="rtl">
-            <p class="text-xs font-medium text-cyan-200 sm:text-sm">دسته‌بندی</p>
-            <strong class="mt-1 block text-xl font-bold sm:text-3xl">{{ slide.category.name }}</strong>
+            <strong class="mt-1 block text-xl font-bold sm:text-3xl ">{{ slide.category.name }}</strong>
             {% if slide.category.tagline %}
-              <p class="mt-2 max-w-xl text-sm text-white/85 sm:text-base">{{ slide.category.tagline }}</p>
+              <p class="mt-2 max-w-xl text-sm text-cyan-200 sm:text-base">{{ slide.category.tagline }}</p>
             {% endif %}
             <span class="mt-4 inline-flex items-center gap-2 rounded-full bg-cyanbtn px-4 py-2 text-sm font-bold text-white">مشاهده محصولات</span>
           </div>

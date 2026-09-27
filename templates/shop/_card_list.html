@@ -1,0 +1,5 @@
+{% for product in products %}
+  {% for variant in product.listing_boxes %}
+    {% include "shop/_card.html" with product=product variant=variant layout=layout %}
+  {% endfor %}
+{% endfor %}

@@ -4,7 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}کشت‌دریپ{% endblock %}</title>
+  <title>{% block title %}{{ seo.title }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ seo.description }}{% endblock %}">
+  <link rel="canonical" href="{{ seo.canonical }}">
+  <meta name="robots" content="{{ seo.robots }}">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:type" content="{{ seo.og_type }}">
+  <meta property="og:site_name" content="کشت‌دریپ">
+  <meta property="og:title" content="{{ seo.title }}">
+  <meta property="og:description" content="{{ seo.description }}">
+  <meta property="og:url" content="{{ seo.canonical }}">
+  {% if seo.image %}
+    <meta property="og:image" content="{{ seo.image }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ seo.image }}">
+  {% else %}
+    <meta name="twitter:card" content="summary">
+  {% endif %}
+  <meta name="twitter:title" content="{{ seo.title }}">
+  <meta name="twitter:description" content="{{ seo.description }}">
+  <script type="application/ld+json">{{ seo.json_ld }}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,11 +40,11 @@
             </button>
           </div>
           <a href="{% url 'home' %}" class="shrink-0 leading-none">
-            <img loading="lazy" width="45" height="30" class="h-[32px] w-auto max-w-[92px] object-contain md:h-[34px] md:max-w-none" alt="فروشگاه اینترنتی کشت‌دریپ" src="https://keshtdrip.ir/shop-resources/iTlDUgHTdI/shop-logos/1783256109_5070162159.png?size=300x300&rs=fit">
+            <img loading="lazy" width="45" height="30" class="h-[32px] w-auto max-w-[92px] object-contain md:h-[34px] md:max-w-none" alt="کشت‌دریپ، خرید نوار تیپ و لوازم آبیاری" src="https://keshtdrip.ir/shop-resources/iTlDUgHTdI/shop-logos/1783256109_5070162159.png?size=300x300&rs=fit">
           </a>
           <form action="{% url 'catalog' %}" method="get" class="relative grow shrink rounded-xl border border-slate-200 bg-white shadow-sm transition focus-within:border-cyanbtn focus-within:shadow-[0_0_0_3px_rgba(102,187,106,0.12)] md:max-w-[640px]">
             <svg class="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
-            <input class="h-[44px] w-full bg-transparent py-2 pl-3 pr-12 text-sm text-slate-800 outline-none placeholder:text-slate-400" name="q" placeholder="جستجو در محصولات کشت‌دریپ" value="{{ query|default:'' }}">
+            <input class="h-[44px] w-full bg-transparent py-2 pl-3 pr-12 text-sm text-slate-800 outline-none placeholder:text-slate-400" name="q" placeholder="جستجو؛ نوار تیپ، لوله، اتصالات" value="{{ query|default:'' }}">
           </form>
         </div>
         <div class="flex min-w-fit flex-row items-center gap-2 py-1 sm:gap-3">
@@ -57,6 +76,7 @@
           <span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span>
         </a>
         <a href="{% url 'home' %}" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">خانه<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
+        <a href="{% url 'catalog' %}?category=drip-tape" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">نوار تیپ<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
         <a href="{% url 'cart' %}" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">پیگیری سفارش<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
         <a href="{% url 'catalog' %}" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">همه محصولات<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
         <a href="{% url 'blog' %}" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">وبلاگ<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
@@ -65,7 +85,8 @@
     </section>
     <nav id="kd-mobile-nav" class="hidden flex-col gap-1 border-t border-slate-200 bg-white px-4 py-3 text-sm md:hidden">
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
-      <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'catalog' %}">همه محصولات</a>
+      <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'catalog' %}?category=drip-tape">نوار تیپ</a>
+      <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'catalog' %}">خرید لوازم آبیاری</a>
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'blog' %}">وبلاگ</a>
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'about' %}">درباره ما</a>
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'cart' %}">سبد خرید</a>
@@ -122,7 +143,8 @@
           <ul class="flex flex-col gap-3 text-sm">
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'about' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>درباره ما</span></a></li>
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'blog' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>وبلاگ</span></a></li>
-            <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'catalog' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>همه محصولات</span></a></li>
+            <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'catalog' %}?category=drip-tape"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>خرید نوار تیپ</span></a></li>
+            <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'catalog' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>خرید لوازم آبیاری</span></a></li>
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'cart' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>سبد خرید</span></a></li>
           </ul>
         </section>
@@ -143,7 +165,7 @@
       <div class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
         <article class="flex min-w-0 flex-col gap-3">
           <h3 class="font-bold text-white">معرفی فروشگاه</h3>
-          <p class="max-w-3xl text-sm leading-7 text-slate-400">کشت دریپ، مرجع تخصصی تامین و فروش تجهیزات آبیاری قطره‌ای در ایران است. هدف ما افزایش راندمان محصولات شما، کاهش مصرف آب و حذف واسطه‌هاست. کشت دریپ؛ حافظ آب، حامی کشاورز.</p>
+          <p class="max-w-3xl text-sm leading-7 text-slate-400">کشت‌دریپ مرجع خرید نوار تیپ و خرید لوازم آبیاری قطره‌ای در ایران است. نوار تیپ پلاکدار و درزدار، لوله، فیلتر و اتصالات را با مشخصات فنی شفاف سفارش دهید تا مصرف آب کمتر و یکنواختی آبیاری بیشتر شود.</p>
         </article>
         <p class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-slate-500">استفاده از مطالب فروشگاه اینترنتی کشت‌دریپ فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است. کلیه حقوق این سایت محفوظ می‌باشد.</p>
       </div>

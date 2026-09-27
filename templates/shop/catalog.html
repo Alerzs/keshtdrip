@@ -1,9 +1,19 @@
 {% extends "base.html" %}
-{% block title %}فروشگاه | کشت‌دریپ{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
-  <h1 class="mb-2 text-2xl font-bold">{% if active_brand and active_category %}{{ active_category.name }} {{ active_brand.name }}{% elif active_brand %}{{ active_brand.name }}{% elif active_category %}{{ active_category.name }}{% else %}محصولات{% endif %}</h1>
-  <p class="mb-6 text-slate-500">{% if active_category %}{{ active_category.tagline }}{% else %}گروه محصول را انتخاب کنید یا نام کالا را جستجو کنید.{% endif %}</p>
+  <nav class="mb-4 text-sm text-slate-400" aria-label="مسیر صفحه">
+    <a class="hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
+    <span class="mx-1">/</span>
+    {% if active_category or active_brand or query %}
+      <a class="hover:text-cyanbtn" href="{% url 'catalog' %}">خرید لوازم آبیاری</a>
+      <span class="mx-1">/</span>
+      <span class="text-slate-600">{{ seo.heading }}</span>
+    {% else %}
+      <span class="text-slate-600">خرید لوازم آبیاری</span>
+    {% endif %}
+  </nav>
+  <h1 class="mb-2 text-2xl font-bold">{{ seo.heading }}</h1>
+  <p class="mb-6 text-slate-500">{% if seo.intro %}{{ seo.intro }}{% elif active_category %}{{ active_category.tagline }}{% else %}گروه محصول را انتخاب کنید یا نام کالا را جستجو کنید.{% endif %}</p>
   <form class="mb-6 flex max-w-xl gap-2" action="{% url 'catalog' %}" method="get">
     {% if active_category %}
       <input type="hidden" name="category" value="{{ active_category.slug }}">
@@ -29,10 +39,8 @@
     </div>
   {% endif %}
   {% if products %}
-    <div class="grid grid-cols-2 gap-2 rounded-xl bg-rail p-2 sm:grid-cols-3 md:grid-cols-4 md:gap-3 md:p-3">
-      {% for product in products %}
-        {% include "shop/_card.html" with layout="grid" %}
-      {% endfor %}
+    <div class="grid grid-cols-2 items-stretch gap-2 rounded-xl bg-rail p-2 sm:grid-cols-3 md:grid-cols-4 md:gap-3 md:p-3">
+      {% include "shop/_card_list.html" with products=products layout="grid" %}
     </div>
   {% else %}
     <p class="text-slate-500">محصولی در این گروه یافت نشد.</p>

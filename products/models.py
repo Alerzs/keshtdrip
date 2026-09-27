@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -7,6 +8,12 @@ class Category(models.Model):
     slug = models.SlugField(unique=True, allow_unicode=True)
     tagline = models.CharField(max_length=160)
     image = models.ImageField(upload_to="categories/", blank=True)
+    showcase_image = models.ImageField(
+        "تصویر ویترین",
+        upload_to="categories/showcase/",
+        blank=True,
+        help_text="تصویر اسلاید صفحه اصلی. جدا از تصویر کارت دسته است.",
+    )
 
     class Meta:
         verbose_name = "دسته"
@@ -42,7 +49,9 @@ class Product(models.Model):
     slug = models.SlugField(unique=True, allow_unicode=True)
     blurb = models.CharField(max_length=220)
     description = models.TextField()
-    price = models.PositiveIntegerField(help_text="قیمت به تومان")
+    price = models.PositiveIntegerField(
+        help_text="قیمت به تومان. اگر فشار کاری یا قطر تعریف شود، قیمت همان تنوع در فروشگاه نشان داده می‌شود."
+    )
     unit = models.CharField(max_length=40, default="عدد")
     brand = models.ForeignKey("Brand", related_name="products", on_delete=models.PROTECT)
     badge = models.CharField(max_length=40, blank=True)
@@ -61,6 +70,66 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("product_detail", kwargs={"slug": self.slug})
+
+    def listing_boxes(self):
+        variants = list(self.variants.all())
+        return variants or [None]
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, related_name="variants", on_delete=models.CASCADE)
+    working_pressure = models.CharField(
+        "فشار کاری",
+        max_length=40,
+        blank=True,
+        help_text="اختیاری. مثال: 4 بار",
+    )
+    diameter = models.CharField(
+        "قطر",
+        max_length=40,
+        blank=True,
+        help_text="اختیاری. مثال: 16 میلی‌متر",
+    )
+    price = models.PositiveIntegerField("قیمت", help_text="قیمت این ترکیب به تومان")
+    sort_order = models.PositiveSmallIntegerField("ترتیب", default=0)
+
+    class Meta:
+        verbose_name = "تنوع محصول"
+        verbose_name_plural = "تنوع‌ها"
+        ordering = ["sort_order", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "working_pressure", "diameter"],
+                name="unique_product_pressure_diameter",
+            )
+        ]
+
+    def __str__(self):
+        return self.spec_label or f"قیمت {self.price}"
+
+    def clean(self):
+        super().clean()
+        self.working_pressure = (self.working_pressure or "").strip()
+        self.diameter = (self.diameter or "").strip()
+        if not self.working_pressure and not self.diameter:
+            raise ValidationError("حداقل یکی از فیلدهای فشار کاری یا قطر را وارد کنید.")
+
+    def save(self, *args, **kwargs):
+        self.working_pressure = (self.working_pressure or "").strip()
+        self.diameter = (self.diameter or "").strip()
+        super().save(*args, **kwargs)
+
+    @property
+    def spec_label(self):
+        parts = []
+        if self.diameter:
+            parts.append(f"قطر {self.diameter}")
+        if self.working_pressure:
+            parts.append(f"فشار کاری {self.working_pressure}")
+        return "، ".join(parts)
+
+    def get_absolute_url(self):
+        return f"{self.product.get_absolute_url()}?variant={self.pk}"
 
 
 class ProductImage(models.Model):
