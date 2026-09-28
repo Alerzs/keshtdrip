@@ -40,7 +40,7 @@
                     {% if item.variant %}
                       <div class="mt-1 text-xs text-slate-500">{{ item.variant.spec_label|fa_num }}</div>
                     {% endif %}
-                    <div class="mt-1 text-xs text-slate-500">کد کالا : <span dir="ltr">{{ item.product.slug }}</span></div>
+                    <div class="mt-1 text-xs text-slate-500">کد کالا : <span dir="ltr">{% if item.variant %}{{ item.variant.slug }}{% else %}{{ item.product.slug }}{% endif %}</span></div>
                     <div class="mt-auto space-y-1.5 pt-6 text-sm">
                       <div class="flex flex-wrap items-baseline gap-x-2">
                         <span class="text-slate-500">قیمت کل:</span>

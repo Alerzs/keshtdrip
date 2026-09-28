@@ -222,7 +222,7 @@ def catalog_seo(request, *, category, brand, query, products):
     )
 
 
-def product_seo(request, product, *, price, image=""):
+def product_seo(request, product, *, price, image="", sku=""):
     description = product.blurb or product.description
     description = f"خرید {product.name} از کشت‌دریپ. {description}"
     url = absolute_url(request, product.get_absolute_url())
@@ -239,7 +239,7 @@ def product_seo(request, product, *, price, image=""):
         "@type": "Product",
         "name": product.name,
         "description": clip(description, 300),
-        "sku": product.slug,
+        "sku": sku or product.slug,
         "url": url,
         "brand": {"@type": "Brand", "name": product.brand.name},
         "category": product.category.name,

@@ -78,6 +78,13 @@ class Product(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, related_name="variants", on_delete=models.CASCADE)
+    slug = models.SlugField(
+        "کد",
+        max_length=80,
+        unique=True,
+        allow_unicode=True,
+        help_text="کد یکتای این تنوع. برای هر تنوع الزامی است.",
+    )
     working_pressure = models.CharField(
         "فشار کاری",
         max_length=40,
@@ -109,12 +116,16 @@ class ProductVariant(models.Model):
 
     def clean(self):
         super().clean()
+        self.slug = (self.slug or "").strip()
         self.working_pressure = (self.working_pressure or "").strip()
         self.diameter = (self.diameter or "").strip()
+        if not self.slug:
+            raise ValidationError({"slug": "کد را برای این تنوع وارد کنید."})
         if not self.working_pressure and not self.diameter:
             raise ValidationError("حداقل یکی از فیلدهای فشار کاری یا قطر را وارد کنید.")
 
     def save(self, *args, **kwargs):
+        self.slug = (self.slug or "").strip()
         self.working_pressure = (self.working_pressure or "").strip()
         self.diameter = (self.diameter or "").strip()
         super().save(*args, **kwargs)

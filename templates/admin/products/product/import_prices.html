@@ -1,0 +1,47 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">خانه</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:products_product_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; ورود قیمت
+</div>
+{% endblock %}
+
+{% block content %}
+  <p>
+    فایل اکسل باید ردیف عنوان داشته باشد. ستون‌های لازم
+    <strong>کد محصول</strong> و <strong>قیمت</strong> هستند.
+    برای تنوع‌ها ستون‌های <strong>فشار کاری</strong> و <strong>قطر</strong> را هم پر کنید.
+    قیمت به تومان و عدد صحیح است. اگر آن دو ستون خالی باشند، قیمت خود محصول به‌روز می‌شود.
+  </p>
+  <p>
+    <a href="{% url 'admin:products_product_export_prices' %}">دانلود قیمت‌های فعلی</a>
+  </p>
+
+  {% if form_error %}
+    <p class="errornote">{{ form_error }}</p>
+  {% endif %}
+
+  {% if result.errors %}
+    <ul>
+      {% for error in result.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <div class="form-row">
+        <label for="id_file">فایل اکسل:</label>
+        <input id="id_file" type="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+      </div>
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" value="به‌روزرسانی قیمت‌ها" class="default">
+    </div>
+  </form>
+{% endblock %}

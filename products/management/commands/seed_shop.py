@@ -708,8 +708,10 @@ class Command(BaseCommand):
             category_slug = data.pop("category")
             brand_slug = data.pop("brand")
             product = Product.objects.create(category=cats[category_slug], brand=brands[brand_slug], **data)
-            for spec in SPECS.get(product.slug, []):
-                ProductVariant.objects.create(product=product, **spec)
+            for index, spec in enumerate(SPECS.get(product.slug, []), start=1):
+                payload = dict(spec)
+                payload.setdefault("slug", f"{product.slug}-{index}")
+                ProductVariant.objects.create(product=product, **payload)
         variant_count = sum(len(items) for items in SPECS.values())
         self.stdout.write(
             self.style.SUCCESS(

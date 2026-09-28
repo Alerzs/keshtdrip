@@ -23,8 +23,7 @@
               <input type="hidden" name="next" value="{% url 'cart' %}">
               <input type="hidden" name="quantity" value="1">
               {% if variant %}
-                <input type="hidden" name="working_pressure" value="{{ variant.working_pressure }}">
-                <input type="hidden" name="diameter" value="{{ variant.diameter }}">
+                <input type="hidden" name="variant_slug" value="{{ variant.slug }}">
               {% endif %}
               <button class="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-cyanbtn text-sm font-bold text-white transition hover:bg-cyanbtnHover" type="submit">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h2l1.2 9.2a2 2 0 0 0 2 1.8h7.6a2 2 0 0 0 2-1.6L20 8H7"/><circle cx="9" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg>

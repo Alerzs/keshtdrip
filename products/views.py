@@ -68,20 +68,11 @@ def _unique_values(values):
     return seen
 
 
-def _match_variant(variants, pressure, diameter):
-    for variant in variants:
-        if pressure is not None and variant.working_pressure != pressure:
-            continue
-        if diameter is not None and variant.diameter != diameter:
-            continue
-        return variant
-    return None
-
-
 def _variant_payload(variants):
     return [
         {
             "id": variant.id,
+            "slug": variant.slug,
             "working_pressure": variant.working_pressure,
             "diameter": variant.diameter,
             "price": variant.price,
@@ -230,6 +221,7 @@ def product_detail(request, slug):
             product,
             price=selected_variant.price if selected_variant else product.price,
             image=image,
+            sku=selected_variant.slug if selected_variant else product.slug,
         ),
     )
     return render(
@@ -256,11 +248,13 @@ def add_to_cart(request, slug):
     variants = list(product.variants.all())
     variant = None
     if variants:
-        pressure = request.POST.get("working_pressure") if "working_pressure" in request.POST else None
-        diameter = request.POST.get("diameter") if "diameter" in request.POST else None
-        variant = _match_variant(variants, pressure, diameter)
+        submitted_slug = (request.POST.get("variant_slug") or "").strip()
+        if not submitted_slug:
+            messages.error(request, "کد این تنوع ارسال نشده است.")
+            return redirect(product.get_absolute_url())
+        variant = next((item for item in variants if item.slug == submitted_slug), None)
         if variant is None:
-            messages.error(request, "این ترکیب فشار کاری و قطر موجود نیست.")
+            messages.error(request, "این تنوع موجود نیست.")
             return redirect(product.get_absolute_url())
     cart_store.add_item(request.session, product.id, qty, variant.id if variant else None)
     label = product.name
