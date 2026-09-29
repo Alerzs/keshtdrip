@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import path
 
-from .models import Brand, Category, Product, ProductImage, ProductVariant
+from .models import Brand, Category, Product, ProductAttribute, ProductImage, ProductVariant
 from .price_import import PriceImportError, build_price_workbook, import_price_workbook
 
 
@@ -25,7 +25,13 @@ class BrandAdmin(admin.ModelAdmin):
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    fields = ("slug", "working_pressure", "diameter", "price", "sort_order")
+    fields = ("slug", "working_pressure", "diameter", "price", "featured", "sort_order")
+
+
+class ProductAttributeInline(admin.TabularInline):
+    model = ProductAttribute
+    extra = 1
+    fields = ("name", "value", "sort_order")
 
 
 class ProductImageInline(admin.TabularInline):
@@ -36,11 +42,11 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "brand", "price", "variant_total", "unit", "featured", "stock")
-    list_filter = ("category", "brand", "featured")
+    list_display = ("name", "category", "brand", "badge", "price", "variant_total", "unit", "featured_variant", "stock")
+    list_filter = ("category", "brand")
     search_fields = ("name", "blurb")
     prepopulated_fields = {"slug": ("name",)}
-    inlines = [ProductVariantInline, ProductImageInline]
+    inlines = [ProductVariantInline, ProductAttributeInline, ProductImageInline]
     change_list_template = "admin/products/product/change_list.html"
 
     def get_urls(self):
@@ -101,8 +107,15 @@ class ProductAdmin(admin.ModelAdmin):
         return response
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(variant_total=Count("variants"))
+        return super().get_queryset(request).annotate(variant_total=Count("variants")).prefetch_related("variants")
 
     @admin.display(description="تنوع‌ها", ordering="variant_total")
     def variant_total(self, obj):
         return obj.variant_total
+
+    @admin.display(description="تنوع ویژه")
+    def featured_variant(self, obj):
+        variant = next((item for item in obj.variants.all() if item.featured), None)
+        if variant is None:
+            return "—"
+        return variant.spec_label or variant.slug

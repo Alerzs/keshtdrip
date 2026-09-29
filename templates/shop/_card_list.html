@@ -1,5 +1,15 @@
-{% for product in products %}
-  {% for variant in product.listing_boxes %}
-    {% include "shop/_card.html" with product=product variant=variant layout=layout %}
+{% if variants %}
+  {% for variant in variants %}
+    {% include "shop/_card.html" with product=variant.product variant=variant layout=layout %}
   {% endfor %}
-{% endfor %}
+{% else %}
+  {% for product in products %}
+    {% if single_variant %}
+      {% include "shop/_card.html" with product=product variant=product.featured_box layout=layout %}
+    {% else %}
+      {% for variant in product.listing_boxes %}
+        {% include "shop/_card.html" with product=product variant=variant layout=layout %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

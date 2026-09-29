@@ -1,6 +1,6 @@
 {% load persian %}
 <a class="{% if layout == 'grid' %}flex w-full flex-col items-stretch gap-4 bg-white p-4{% else %}flex w-[250px] shrink-0 flex-col items-stretch gap-4 bg-white p-4{% endif %} group self-stretch overflow-hidden rounded-xl border border-transparent transition duration-200 hover:-translate-y-0.5 hover:border-cyanbtn/40 hover:shadow-lg" href="{% if variant %}{{ variant.get_absolute_url }}{% else %}{{ product.get_absolute_url }}{% endif %}">
-  {% include "shop/_media.html" with file=product.image alt=product.name label="تصویر محصول" size="card" %}
+  {% include "shop/_media.html" with src=product.image alt=product.name label="تصویر محصول" size="card" badge=product.badge %}
   <span class="line-clamp-2 h-[45px] w-full font-medium text-slate-800 md:h-[52px]">{{ product.name }}</span>
   <span class="flex min-h-7 w-full flex-wrap content-start gap-1">
     {% if variant %}
@@ -11,6 +11,9 @@
         <span class="max-w-full truncate rounded-md bg-slate-100 px-2 py-0.5 text-xs leading-5 text-slate-600">فشار {{ variant.working_pressure|fa_num }}</span>
       {% endif %}
     {% endif %}
+    {% for attr in product.attributes.all %}
+      <span class="max-w-full truncate rounded-md bg-slate-100 px-2 py-0.5 text-xs leading-5 text-slate-600">{{ attr.name }} {{ attr.value|fa_num }}</span>
+    {% endfor %}
   </span>
   <div class="mt-auto flex w-full flex-col items-start">
     {% if product.category %}

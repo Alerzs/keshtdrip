@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from openpyxl import Workbook, load_workbook
 
-from products.models import Brand, Category, Product, ProductVariant
+from products.models import Brand, Category, Product, ProductAttribute, ProductVariant
 from products.price_import import PriceImportError, import_price_workbook
 
 
@@ -91,6 +91,46 @@ class ProductVariantTests(TestCase):
         cart = self.client.get(reverse("cart"))
         self.assertContains(cart, "سبد خرید")
         self.assertNotContains(cart, "لوله قطره‌ای")
+
+    def test_related_rail_shows_the_featured_variant(self):
+        self.high.featured = True
+        self.high.save()
+        response = self.client.get(self.plain.get_absolute_url())
+        self.assertContains(response, "محصولات مرتبط")
+        self.assertContains(response, self.high.get_absolute_url())
+        self.assertContains(response, "۱۸۰٬۰۰۰")
+        self.assertNotContains(response, self.low.get_absolute_url())
+        self.assertNotContains(response, "۱۰۰٬۰۰۰")
+
+    def test_product_attribute_shows_on_the_card_with_specs(self):
+        ProductAttribute.objects.create(product=self.product, name="طول", value="1000 متر")
+        response = self.client.get(reverse("catalog"))
+        self.assertContains(response, "طول")
+        self.assertContains(response, "۱۰۰۰ متر")
+        self.assertContains(response, "قطر")
+        self.assertContains(response, "فشار")
+
+    def test_product_badge_shows_on_the_rail_card(self):
+        self.plain.badge = "پرفروش"
+        self.plain.save()
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "پرفروش")
+        self.assertContains(response, self.plain.get_absolute_url())
+
+    def test_featured_rail_lists_every_featured_variant(self):
+        self.low.featured = True
+        self.low.save()
+        self.high.featured = True
+        self.high.save()
+        self.low.refresh_from_db()
+        self.high.refresh_from_db()
+        self.assertTrue(self.low.featured)
+        self.assertTrue(self.high.featured)
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, self.low.get_absolute_url())
+        self.assertContains(response, self.high.get_absolute_url())
+        self.assertContains(response, "۱۰۰٬۰۰۰")
+        self.assertContains(response, "۱۸۰٬۰۰۰")
 
     def test_cart_requires_the_variant_slug(self):
         response = self.client.post(

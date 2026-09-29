@@ -7,12 +7,17 @@ class Category(models.Model):
     name = models.CharField(max_length=80)
     slug = models.SlugField(unique=True, allow_unicode=True)
     tagline = models.CharField(max_length=160)
-    image = models.ImageField(upload_to="categories/", blank=True)
-    showcase_image = models.ImageField(
-        "تصویر ویترین",
-        upload_to="categories/showcase/",
+    image = models.CharField(
+        "آدرس تصویر",
+        max_length=300,
         blank=True,
-        help_text="تصویر اسلاید صفحه اصلی. جدا از تصویر کارت دسته است.",
+        help_text="آدرس مستقیم فایل در static. مثال: /static/img/categories/drip-tape.svg",
+    )
+    showcase_image = models.CharField(
+        "آدرس تصویر ویترین",
+        max_length=300,
+        blank=True,
+        help_text="آدرس مستقیم اسلاید صفحه اصلی در static. جدا از تصویر کارت دسته است.",
     )
 
     class Meta:
@@ -54,10 +59,19 @@ class Product(models.Model):
     )
     unit = models.CharField(max_length=40, default="عدد")
     brand = models.ForeignKey("Brand", related_name="products", on_delete=models.PROTECT)
-    badge = models.CharField(max_length=40, blank=True)
+    badge = models.CharField(
+        "برچسب",
+        max_length=40,
+        blank=True,
+        help_text="متن کوتاه روی کارت محصول. مثال: پرفروش",
+    )
     stock = models.PositiveIntegerField(default=40)
-    featured = models.BooleanField(default=False)
-    image = models.ImageField(upload_to="products/", blank=True)
+    image = models.CharField(
+        "آدرس تصویر",
+        max_length=300,
+        blank=True,
+        help_text="آدرس مستقیم فایل در static. مثال: /static/img/products/KSH-P-00000002.svg",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -74,6 +88,33 @@ class Product(models.Model):
     def listing_boxes(self):
         variants = list(self.variants.all())
         return variants or [None]
+
+    def featured_box(self):
+        variants = list(self.variants.all())
+        for variant in variants:
+            if variant.featured:
+                return variant
+        return variants[0] if variants else None
+
+
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(Product, related_name="attributes", on_delete=models.CASCADE)
+    name = models.CharField("عنوان", max_length=40, help_text="مثال: طول")
+    value = models.CharField("مقدار", max_length=40, help_text="مثال: 1000 متر")
+    sort_order = models.PositiveSmallIntegerField("ترتیب", default=0)
+
+    class Meta:
+        verbose_name = "ویژگی"
+        verbose_name_plural = "ویژگی‌ها"
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return f"{self.name} {self.value}"
+
+    def save(self, *args, **kwargs):
+        self.name = (self.name or "").strip()
+        self.value = (self.value or "").strip()
+        super().save(*args, **kwargs)
 
 
 class ProductVariant(models.Model):
@@ -98,6 +139,11 @@ class ProductVariant(models.Model):
         help_text="اختیاری. مثال: 16 میلی‌متر",
     )
     price = models.PositiveIntegerField("قیمت", help_text="قیمت این ترکیب به تومان")
+    featured = models.BooleanField(
+        "ویژه",
+        default=False,
+        help_text="این تنوع در ریل محصولات ویژه نشان داده می‌شود.",
+    )
     sort_order = models.PositiveSmallIntegerField("ترتیب", default=0)
 
     class Meta:
@@ -145,7 +191,11 @@ class ProductVariant(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="products/gallery/")
+    image = models.CharField(
+        "آدرس تصویر",
+        max_length=300,
+        help_text="آدرس مستقیم فایل در static. مثال: /static/img/products/KSH-P-00000002-2.svg",
+    )
     alt = models.CharField("عنوان تصویر", max_length=140, blank=True)
     sort_order = models.PositiveSmallIntegerField(default=0)
 

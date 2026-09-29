@@ -1,17 +1,14 @@
-from pathlib import Path
-
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from . import cart as cart_store
 from .blog_posts import all_posts, get_post
-from .models import Brand, Category, Product
+from .images import image_src, sibling_image_urls
+from .models import Brand, Category, Product, ProductVariant
 from .seo import PRIVATE_DESCRIPTION, absolute_url, attach, blog_seo, catalog_seo, pack, product_seo
 
 
@@ -20,44 +17,25 @@ def _product_gallery(product):
     seen = set()
 
     def add(url, alt):
+        url = image_src(url)
         if url and url not in seen:
             seen.add(url)
             items.append({"url": url, "alt": alt})
 
     if product.image:
-        add(product.image.url, product.name)
+        add(product.image, product.name)
     for extra in product.images.all():
         if extra.image:
-            add(extra.image.url, extra.alt or product.name)
+            add(extra.image, extra.alt or product.name)
     if len(items) < 2:
-        for extra in _sibling_images(product):
-            add(extra["url"], extra["alt"])
+        for url in sibling_image_urls(product.image):
+            add(url, f"{product.name} — نمای {len(items) + 1}")
     return items
-
-
-def _sibling_images(product):
-    if not product.image:
-        return []
-    rel = Path(product.image.name)
-    folder = Path(settings.MEDIA_ROOT) / rel.parent
-    prefix = "".join(ch for ch in rel.stem if not ch.isdigit())
-    if not prefix or not folder.is_dir():
-        return []
-    extras = []
-    for path in sorted(folder.iterdir()):
-        if not path.is_file() or path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp"}:
-            continue
-        stem = "".join(ch for ch in path.stem if not ch.isdigit())
-        if stem != prefix:
-            continue
-        stored = (rel.parent / path.name).as_posix()
-        extras.append({"url": default_storage.url(stored), "alt": f"{product.name} — نمای {len(extras) + 1}"})
-    return extras
 
 
 def _catalog(qs=None):
     products = qs if qs is not None else Product.objects.all()
-    return products.select_related("category", "brand").prefetch_related("variants")
+    return products.select_related("category", "brand").prefetch_related("variants", "attributes")
 
 
 def _unique_values(values):
@@ -135,12 +113,21 @@ def _cart_items(session):
     return items, total
 
 
+def _featured_variants(in_cart_ids=None):
+    variants = ProductVariant.objects.filter(featured=True).select_related(
+        "product", "product__category", "product__brand"
+    ).prefetch_related("product__attributes")
+    if in_cart_ids is not None:
+        variants = variants.filter(product__stock__gt=0).exclude(product_id__in=in_cart_ids)
+    return variants.order_by("product__name", "sort_order", "id")
+
+
 def home(request):
     categories = list(Category.objects.all())
-    featured = _catalog(Product.objects.filter(featured=True))
-    fresh = _catalog().order_by("-created_at")[:12]
+    featured = _featured_variants()
+    fresh = _catalog().order_by("-created_at")
     showcase = [
-        {"category": cat, "image_url": cat.showcase_image.url}
+        {"category": cat, "image_url": image_src(cat.showcase_image)}
         for cat in categories
         if cat.showcase_image
     ]
@@ -152,6 +139,7 @@ def home(request):
             "featured": featured,
             "fresh": fresh,
             "showcase": showcase,
+            "pipes": _catalog(Product.objects.filter(category__slug="layflat")),
             "tapes": _catalog(Product.objects.filter(category__slug="drip-tape")),
             "drips": _catalog(Product.objects.filter(category__slug="irrigation")),
             "joints": _catalog(Product.objects.filter(category__slug="joints")),
@@ -283,9 +271,7 @@ def remove_from_cart(request, line_key):
 def cart_view(request):
     items, total = _cart_items(request.session)
     in_cart_ids = [item["product"].id for item in items]
-    featured = _catalog(
-        Product.objects.filter(featured=True, stock__gt=0).exclude(id__in=in_cart_ids)
-    )
+    featured = _featured_variants(in_cart_ids)
     return render(
         request,
         "shop/cart.html",

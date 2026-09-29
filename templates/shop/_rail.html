@@ -1,4 +1,4 @@
-{% if products %}
+{% if products or variants %}
 <section class="mx-auto w-full max-w-[1440px] rounded-xl bg-rail px-4 pb-6 xl:px-6">
   <div class="flex items-center justify-between py-4">
     <h2 class="border-b-2 border-sky-400 pb-1 font-semibold text-slate-800">{{ title }}</h2>
@@ -12,7 +12,7 @@
       <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
     </button>
     <div class="kd-rail-track flex cursor-grab items-stretch select-none gap-2 overflow-x-auto py-2 [scrollbar-width:none] [-webkit-user-drag:none] [&::-webkit-scrollbar]:hidden [&_img]:pointer-events-none">
-      {% include "shop/_card_list.html" with products=products %}
+      {% include "shop/_card_list.html" with products=products variants=variants single_variant=single_variant %}
       {% if more_url %}
         <a class="kd-rail-more hidden flex min-h-[280px] w-[150px] shrink-0 items-center justify-center gap-1.5 rounded-xl border border-transparent bg-white p-4 text-lg font-semibold text-slate-800 transition duration-200 hover:-translate-y-0.5 hover:border-cyanbtn/40 hover:text-cyanbtn hover:shadow-lg" href="{{ more_url }}">
           <span class="whitespace-nowrap">مشاهده همه</span>

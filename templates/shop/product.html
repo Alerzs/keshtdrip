@@ -131,7 +131,7 @@
   </form>
 </article>
 {% if related %}
-  {% include "shop/_rail.html" with products=related title="محصولات مرتبط" more_url=product.category.get_absolute_url %}
+  {% include "shop/_rail.html" with products=related title="محصولات مرتبط" more_url=product.category.get_absolute_url single_variant=True %}
 {% endif %}
 {% endblock %}
 {% block extra_js %}

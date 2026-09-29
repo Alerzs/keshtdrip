@@ -19,7 +19,7 @@
                 <div class="flex items-stretch gap-3 sm:gap-5">
                   <div class="flex w-[120px] shrink-0 flex-col sm:w-[130px]">
                     <a class="mb-2 block overflow-hidden rounded-lg bg-slate-50" href="{% if item.variant %}{{ item.variant.get_absolute_url }}{% else %}{{ item.product.get_absolute_url }}{% endif %}">
-                      {% include "shop/_media.html" with file=item.product.image alt=item.product.name label="تصویر" size="basket" %}
+                      {% include "shop/_media.html" with src=item.product.image alt=item.product.name label="تصویر" size="basket" %}
                     </a>
                     <form method="post" action="{% url 'update_cart' item.key %}" class="mt-auto" data-kd-qty-form>
                       {% csrf_token %}

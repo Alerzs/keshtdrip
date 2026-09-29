@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db import connection
 
 from products.models import Brand, Category, Product, ProductVariant
 
@@ -7,26 +8,36 @@ CATEGORIES = [
         "name": "کود شیمیایی",
         "slug": "chemical-fertilizer",
         "tagline": "کود پایه برای تغذیه مزرعه و باغ.",
+        "image": "/static/img/categories/chemical-fertilizer.png",
+        "showcase_image": "/static/img/head2.png",
     },
     {
         "name": "تجهیزات",
         "slug": "equipment",
         "tagline": "لوله باغی، مه پاش و نوار تیپ.",
+        "image": "/static/img/head1.png",
+        "showcase_image": "/static/img/head1.png",
     },
     {
         "name": "لوله پلی اتیلن",
         "slug": "pe-pipe",
         "tagline": "لوله پلی‌اتیلن در سایز و فشار کاری مختلف، فروش متری.",
+        "image": "",
+        "showcase_image": "",
     },
     {
         "name": "لوله نخدار",
         "slug": "layflat",
         "tagline": "لوله نخدار در سایزهای اینچی، رول صد متری.",
+        "image": "/static/img/cat1.png",
+        "showcase_image": "/static/img/cat1.png",
     },
     {
         "name": "نوار تیپ",
         "slug": "drip-tape",
         "tagline": "نوار تیپ آبیاری قطره ای طول 1000 متر",
+        "image": "/static/img/driptape.png",
+        "showcase_image": "/static/img/head3.png",
     },
 ]
 
@@ -46,6 +57,7 @@ PRODUCTS = [
         "category": "chemical-fertilizer",
         "name": "کود اوره 50 کیلوگرم",
         "slug": "KSH-P-00000070",
+        "image": "/static/img/fertelizer.jpg",
         "blurb": "کود اوره 50 کیلوگرم. واحد فروش: کیسه.",
         "description": "کود اوره 50 کیلوگرم از دسته کود شیمیایی. واحد فروش کیسه است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 3500000,
@@ -59,6 +71,7 @@ PRODUCTS = [
         "category": "equipment",
         "name": "لوله 16 باغی /رول 400 متری",
         "slug": "KSH-P-00000023",
+        "image": "",
         "blurb": "لوله 16 باغی /رول 400 متری. واحد فروش: رول.",
         "description": "لوله 16 باغی /رول 400 متری از دسته تجهیزات. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 5650000,
@@ -72,6 +85,7 @@ PRODUCTS = [
         "category": "equipment",
         "name": "لوله باغی / رول 200 متری",
         "slug": "KSH-P-00000024",
+        "image": "",
         "blurb": "لوله 20 باغی / رول 200 متری. واحد فروش: رول.",
         "description": "لوله 20 باغی / رول 200 متری از دسته تجهیزات. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 4400000,
@@ -85,6 +99,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 110",
         "slug": "KSH-P-00000044",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 110. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 110/ از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 528000,
@@ -98,6 +113,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 125",
         "slug": "KSH-P-00000049",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 125. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 125 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 674000,
@@ -111,6 +127,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 160",
         "slug": "KSH-P-00000053",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 160. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 160 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 1112000,
@@ -124,6 +141,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 200",
         "slug": "KSH-P-00000057",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 200. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 200 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 1730000,
@@ -137,6 +155,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 250",
         "slug": "KSH-P-00000061",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 250. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 250 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 2700000,
@@ -150,6 +169,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 315",
         "slug": "KSH-P-00000062",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 315. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 315 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 1895000,
@@ -163,6 +183,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 32",
         "slug": "KSH-P-00000026",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 32. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 32 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 47000,
@@ -176,6 +197,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 50",
         "slug": "KSH-P-00000029",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 50. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 50 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 110000,
@@ -189,6 +211,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 63",
         "slug": "KSH-P-00000031",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 63. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 63 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 176000,
@@ -202,6 +225,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 75",
         "slug": "KSH-P-00000035",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 75. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 75 بار از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 250000,
@@ -215,6 +239,7 @@ PRODUCTS = [
         "category": "pe-pipe",
         "name": "لوله پلی اتیلن سایز 90",
         "slug": "KSH-P-00000038",
+        "image": "",
         "blurb": "لوله پلی اتیلن سایز 90. واحد فروش: متر.",
         "description": "لوله پلی اتیلن سایز 90 از دسته لوله پلی اتیلن. واحد فروش متر است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 354000,
@@ -228,6 +253,7 @@ PRODUCTS = [
         "category": "equipment",
         "name": "لوله مه پاش/100 متر",
         "slug": "KSH-P-00000065",
+        "image": "",
         "blurb": "لوله مه پاش/100 متر. واحد فروش: رول.",
         "description": "لوله مه پاش/100 متر از دسته تجهیزات. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 1491000,
@@ -241,6 +267,7 @@ PRODUCTS = [
         "category": "layflat",
         "name": "لوله نخدار/100 متر/1.5 بار",
         "slug": "KSH-P-00000004",
+        "image": "/static/img/cat1.png",
         "blurb": "لوله نخدار /100 متر. واحد فروش: رول.",
         "description": "لوله نخدار /100 متر از دسته لوله نخدار. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 4368000,
@@ -254,6 +281,7 @@ PRODUCTS = [
         "category": "layflat",
         "name": "لوله نخدار/100 متر/1.2 بار",
         "slug": "KSH-P-00000022",
+        "image": "/static/img/cat1.png",
         "blurb": "لوله نخدار 1 اینچ/100 متر/1.2 بار. واحد فروش: رول.",
         "description": "لوله نخدار 1 اینچ/100 متر/1.2 بار از دسته لوله نخدار. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 11232000,
@@ -267,6 +295,7 @@ PRODUCTS = [
         "category": "drip-tape",
         "name": "نوار تیپ کشت دریپ",
         "slug": "KSH-P-00000002",
+        "image": "/static/img/driptape.png",
         "blurb": "نوار تیپ. واحد فروش: رول.",
         "description": "نوار تیپ از دسته تجهیزات. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 2250000,
@@ -280,6 +309,7 @@ PRODUCTS = [
         "category": "drip-tape",
         "name": "نوار تیپ خوشه چین",
         "slug": "KSH-P-00000001",
+        "image": "/static/img/driptape.png",
         "blurb": "نوار تیپ. واحد فروش: رول.",
         "description": "نوار تیپ از دسته تجهیزات. واحد فروش رول است و قیمت درج‌شده قیمت فروش به تومان است.",
         "price": 2250000,
@@ -695,6 +725,7 @@ class Command(BaseCommand):
     help = "بارگذاری فهرست محصولات"
 
     def handle(self, *args, **options):
+        self.stdout.write(self._current_database())
         Category.objects.all().delete()
         Brand.objects.all().delete()
         cats = {}
@@ -707,10 +738,13 @@ class Command(BaseCommand):
             data = dict(row)
             category_slug = data.pop("category")
             brand_slug = data.pop("brand")
+            featured = data.pop("featured", False)
             product = Product.objects.create(category=cats[category_slug], brand=brands[brand_slug], **data)
             for index, spec in enumerate(SPECS.get(product.slug, []), start=1):
                 payload = dict(spec)
                 payload.setdefault("slug", f"{product.slug}-{index}")
+                if featured and index == 1:
+                    payload["featured"] = True
                 ProductVariant.objects.create(product=product, **payload)
         variant_count = sum(len(items) for items in SPECS.values())
         self.stdout.write(
@@ -718,3 +752,23 @@ class Command(BaseCommand):
                 f"{len(cats)} دسته، {len(brands)} برند، {len(PRODUCTS)} محصول و {variant_count} تنوع ثبت شد."
             )
         )
+
+    def _current_database(self):
+        settings = connection.settings_dict
+        engine = settings.get("ENGINE", "").rsplit(".", 1)[-1]
+        name = settings.get("NAME") or ""
+        host = settings.get("HOST") or ""
+        port = settings.get("PORT") or ""
+        user = settings.get("USER") or ""
+        location = str(name)
+        if host:
+            location = f"{name} @ {host}:{port}" if port else f"{name} @ {host}"
+        if user:
+            location = f"{user}@{location}"
+        counts = (
+            f"{Category.objects.count()} دسته، "
+            f"{Brand.objects.count()} برند، "
+            f"{Product.objects.count()} محصول، "
+            f"{ProductVariant.objects.count()} تنوع"
+        )
+        return f"پایگاه فعلی: {engine} ({location}) — {counts}"

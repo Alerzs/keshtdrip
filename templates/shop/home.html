@@ -5,21 +5,16 @@
     {% include "shop/_finder.html" %}
   </section>
 
-  <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
-    <h1 class="text-xl font-bold text-slate-900 md:text-2xl">خرید نوار تیپ و لوازم آبیاری</h1>
-    <p class="mt-2 max-w-3xl text-sm leading-7 text-slate-600">کشت‌دریپ فروشگاه نوار تیپ و تجهیزات آبیاری قطره‌ای است. برای خرید نوار تیپ و خرید لوازم آبیاری، مشخصات فنی هر کالا را ببینید و سفارش را آنلاین ثبت کنید.</p>
-  </section>
-
-  {% include "shop/_rail.html" with products=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
-  {% include "shop/_rail.html" with products=tapes title="نوار تیپ" more_url="/shop/?category=drip-tape" %}
+  {% include "shop/_rail.html" with variants=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=pipes title="انواع لوله های نخ دار" more_url="/shop/?category=layflat" %}
 
   {% include "shop/_showcase.html" %}
-
+  {% include "shop/_rail.html" with products=tapes title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
   {% if categories %}
   <div class="mx-auto grid w-full max-w-[1440px] grid-cols-6 gap-2 overflow-hidden px-4 md:gap-4 xl:px-20">
     {% for cat in categories|slice:":5" %}
       <a href="{{ cat.get_absolute_url }}" class="{% cycle 'col-span-3' 'col-span-3' 'col-span-2' 'col-span-2' 'col-span-2' %} group block overflow-hidden rounded-xl transition duration-300 ease-out hover:opacity-90">
-        {% include "shop/_media.html" with file=cat.image alt=cat.name label=cat.name size="category" %}
+        {% include "shop/_media.html" with src=cat.image alt=cat.name label=cat.name size="category" %}
       </a>
     {% endfor %}
   </div>
