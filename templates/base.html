@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{{ seo.title }}{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}{{ seo.description }}{% endblock %}">
+  <title>{% block title %}{{ seo.title|default:"خرید نوار تیپ و لوازم آبیاری | کشت‌دریپ" }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ seo.description|default:"خرید نوار تیپ پلاکدار و درزدار با قیمت روز. لوازم آبیاری قطره‌ای، مشاوره رایگان و ارسال سریع به سراسر ایران." }}{% endblock %}">
   <link rel="canonical" href="{{ seo.canonical }}">
   <meta name="robots" content="{{ seo.robots }}">
   <meta property="og:locale" content="fa_IR">

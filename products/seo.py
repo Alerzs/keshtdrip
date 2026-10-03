@@ -12,9 +12,14 @@ from .models import Brand, Category, Product
 
 SITE_NAME = "کشت‌دریپ"
 HOME_TITLE = "خرید نوار تیپ و لوازم آبیاری | کشت‌دریپ"
+HOME_HEADING = "خرید نوار تیپ و لوازم آبیاری قطره‌ای"
 HOME_DESCRIPTION = (
-    "خرید نوار تیپ پلاکدار و درزدار و خرید لوازم آبیاری قطره‌ای از کشت‌دریپ. "
-    "قیمت روز، مشخصات فنی شفاف و ارسال به سراسر ایران."
+    "خرید نوار تیپ پلاکدار و درزدار با قیمت روز. "
+    "لوازم آبیاری قطره‌ای، مشاوره رایگان و ارسال سریع به سراسر ایران."
+)
+HOME_INTRO = (
+    "نوار تیپ پلاکدار و درزدار، لوله، فیلتر و اتصالات را برای آبیاری قطره‌ای "
+    "با قیمت روز و مشخصات فنی شفاف از کشت‌دریپ سفارش دهید."
 )
 TAPE_TITLE = "خرید نوار تیپ | کشت‌دریپ"
 TAPE_DESCRIPTION = (
@@ -136,7 +141,14 @@ def seo_for_request(request):
             description="آموزش انتخاب نوار تیپ، قطعات سامانه و خرید لوازم آبیاری. راهنمای عملی کشت‌دریپ برای مزرعه، باغ و گلخانه.",
             heading="وبلاگ کشت‌دریپ",
         )
-    return pack(request, title=HOME_TITLE, description=HOME_DESCRIPTION, image=absolute_url(request, "/static/img/drip-banner.png"))
+    return pack(
+        request,
+        title=HOME_TITLE,
+        description=HOME_DESCRIPTION,
+        image=absolute_url(request, "/static/img/drip-banner.png"),
+        heading=HOME_HEADING,
+        intro=HOME_INTRO,
+    )
 
 
 def catalog_seo(request, *, category, brand, query, products):

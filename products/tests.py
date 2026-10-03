@@ -146,12 +146,18 @@ class SeoTests(TestCase):
     def test_home_targets_tape_and_irrigation_keywords(self):
         response = self.client.get(reverse("home"))
         self.assertContains(response, "خرید نوار تیپ و لوازم آبیاری | کشت‌دریپ")
-        self.assertContains(response, "خرید نوار تیپ پلاکدار و درزدار")
+        self.assertContains(response, "خرید نوار تیپ پلاکدار و درزدار با قیمت روز")
+        self.assertContains(response, "مشاوره رایگان و ارسال سریع به سراسر ایران")
+        self.assertContains(response, "<h1")
+        self.assertContains(response, "خرید نوار تیپ و لوازم آبیاری قطره‌ای")
         self.assertContains(response, 'rel="canonical"')
         self.assertContains(response, "application/ld+json")
         self.assertContains(response, "OnlineStore")
+        self.assertContains(response, '<meta name="description"')
+        self.assertContains(response, "راهنمای خرید از کشت‌دریپ")
         html = response.content.decode()
         self.assertEqual(html.count("<h1"), 1)
+        self.assertGreaterEqual(html.count("<h2"), 1)
 
     def test_drip_tape_catalog_title_and_heading(self):
         Category.objects.create(name="نوار تیپ", slug="drip-tape", tagline="نوار تیپ آبیاری")
