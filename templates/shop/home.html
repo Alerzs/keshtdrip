@@ -88,35 +88,70 @@
       });
     }
     var viewport = root.querySelector('.kd-finder-viewport') || track.parentElement;
+    var ease = 'transform 520ms cubic-bezier(0.22, 1, 0.36, 1)';
     var dragging = false;
     var dragLock = null;
     var startX = 0;
     var startY = 0;
     var lastX = 0;
-    var dragThreshold = 48;
+    var lastT = 0;
+    var velocity = 0;
+    var pressLink = null;
+    var frame = 0;
+    var pendingX = 0;
+    track.style.transition = ease;
     function setDragOffset(px) {
-      track.style.transform = 'translateX(calc(' + (-index * 100) + '% + ' + px + 'px))';
+      pendingX = px;
+      if (frame) return;
+      frame = requestAnimationFrame(function () {
+        frame = 0;
+        track.style.transform = 'translateX(calc(' + (-index * 100) + '% + ' + pendingX + 'px))';
+      });
+    }
+    function settle(next, fromPx) {
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      if (typeof fromPx === 'number') {
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(calc(' + (-index * 100) + '% + ' + fromPx + 'px))';
+        track.offsetWidth;
+      }
+      track.style.transition = ease;
+      track.offsetWidth;
+      go(next);
     }
     function endDrag(e) {
       if (!dragging) return;
+      var locked = dragLock;
       dragging = false;
       dragLock = null;
       viewport.classList.remove('cursor-grabbing');
       viewport.classList.add('cursor-grab');
-      var dx = (e && typeof e.clientX === 'number' ? e.clientX : lastX) - startX;
-      track.style.transition = '';
-      if (dx < -dragThreshold) go(index + 1);
-      else if (dx > dragThreshold) go(index - 1);
-      else go(index);
+      var x = e && typeof e.clientX === 'number' ? e.clientX : lastX;
+      var dx = x - startX;
+      var link = pressLink;
+      pressLink = null;
+      var width = viewport.clientWidth || 1;
+      var flicked = velocity < -0.45 ? 1 : velocity > 0.45 ? -1 : 0;
+      var stepped = dx < -width * 0.18 ? 1 : dx > width * 0.18 ? -1 : 0;
+      var dir = flicked || stepped;
+      if (!dir && link && viewport.contains(link) && Math.abs(dx) < 12) {
+        window.location.href = link.href;
+        return;
+      }
+      settle(index + dir, locked === 'h' ? dx : undefined);
       start();
     }
     viewport.addEventListener('pointerdown', function (e) {
       if (!slides || (e.pointerType === 'mouse' && e.button !== 0)) return;
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button, a.pointer-events-auto')) return;
       dragging = true;
       dragLock = null;
+      velocity = 0;
+      pendingX = 0;
       startX = lastX = e.clientX;
       startY = e.clientY;
+      lastT = performance.now();
+      pressLink = e.target.closest('a');
       stop();
       track.style.transition = 'none';
       viewport.classList.remove('cursor-grab');
@@ -132,21 +167,29 @@
         dragLock = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
         if (dragLock === 'v') {
           dragging = false;
+          pressLink = null;
           viewport.classList.remove('cursor-grabbing');
           viewport.classList.add('cursor-grab');
-          track.style.transition = '';
-          go(index);
+          settle(index);
           start();
           return;
         }
       }
       if (dragLock !== 'h') return;
       e.preventDefault();
+      var now = performance.now();
+      var dt = now - lastT;
+      if (dt > 0) velocity = (e.clientX - lastX) / dt;
+      lastT = now;
       lastX = e.clientX;
       setDragOffset(dx);
     });
     viewport.addEventListener('pointerup', endDrag);
     viewport.addEventListener('pointercancel', endDrag);
+    viewport.addEventListener('click', function (e) {
+      if (e.target.closest('a') && viewport.contains(e.target.closest('a'))) e.preventDefault();
+    });
+    viewport.addEventListener('dragstart', function (e) { e.preventDefault(); });
     root.addEventListener('mouseenter', function () { if (!dragging) stop(); });
     root.addEventListener('mouseleave', function () { if (!dragging) start(); });
     start();

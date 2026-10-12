@@ -1,37 +1,48 @@
 {% load static %}
 <div class="w-full font-sans">
-  <div id="kd-finder" class="mx-auto flex w-full flex-col gap-3 md:h-[470px] md:flex-row md:items-stretch" dir="ltr">
-    <div class="order-2 grid h-[160px] w-full grid-cols-2 gap-3 md:order-1 md:flex md:h-auto md:w-[30%] md:flex-col">
-      <a href="{% url 'catalog' %}" class="relative min-h-0 overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-lg xl:rounded-md md:flex-1">
-        <img src="{% static 'img/head3-w800.webp' %}" alt="خرید لوازم آبیاری کشت‌دریپ" width="800" height="533" loading="lazy" decoding="async" class="h-full w-full object-cover">
-      </a>
-      <a href="#kd-main-module" class="relative min-h-0 overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:shadow-lg xl:rounded-md md:flex-1">
-        <img src="{% static 'img/head4-w800.webp' %}" alt="تجهیزات آبیاری قطره‌ای" width="800" height="533" loading="lazy" decoding="async" class="h-full w-full object-cover">
-      </a>
+  <div id="kd-finder" class="relative mx-auto h-[400px] w-full overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] sm:h-[500px] md:h-[470px] xl:rounded-md" dir="ltr">
+    <div class="kd-finder-viewport absolute inset-0 w-full cursor-grab overflow-hidden touch-pan-y select-none">
+      <div class="kd-finder-track absolute inset-0 flex transition-transform duration-700 ease-out" style="transform: translateX(0%)">
+        <a href="{% url 'catalog' %}" class="block h-full min-w-full shrink-0 cursor-pointer ">
+          <img src="{% static 'img/head1-w1280.webp' %}?v=6" srcset="{% static 'img/head1-w800.webp' %}?v=6 800w, {% static 'img/head1-w1280.webp' %}?v=6 1280w" sizes="100vw" alt="بزرگترین فروشگاه لوازم آبیاری قطره‌ای" width="1280" height="470" fetchpriority="high" decoding="async" draggable="false" class="pointer-events-none h-full w-full object-cover object-right">
+        </a>
+        <a href="{% url 'catalog' %}?category=chemical-fertilizer" class="block h-full min-w-full shrink-0 cursor-pointer">
+          <img src="{% static 'img/head2-w1280.webp' %}?v=6" srcset="{% static 'img/head2-w800.webp' %}?v=6 800w, {% static 'img/head2-w1280.webp' %}?v=6 1280w" sizes="100vw" alt="عرضه سم و کود صنعتی" width="1280" height="470" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full object-cover object-right">
+        </a>
+        <a href="{% url 'catalog' %}?category=drip-tape" class="block h-full min-w-full shrink-0 cursor-pointer">
+          <img src="{% static 'img/drip-banner-w1280.webp' %}?v=5" srcset="{% static 'img/drip-banner-w800.webp' %}?v=5 800w, {% static 'img/drip-banner-w1280.webp' %}?v=5 1280w" sizes="100vw" alt="نوارتیپ آبیاری قطره‌ای" width="1280" height="470" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full object-cover object-right">
+        </a>
+        <a href="{% url 'blog' %}" class="block h-full min-w-full shrink-0 cursor-pointer">
+          <img src="{% static 'img/drip-banner2-w1280.webp' %}?v=9" srcset="{% static 'img/drip-banner2-w800.webp' %}?v=9 800w, {% static 'img/drip-banner2-w1280.webp' %}?v=9 1280w" sizes="100vw" alt="راهی هوشمند برای کشاورزی پایدار" width="1280" height="470" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full object-cover object-right">
+        </a>
+      </div>
     </div>
 
-    <div class="kd-finder-viewport relative order-1 min-h-[240px] w-full cursor-grab overflow-hidden rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.12)] touch-pan-y select-none sm:min-h-[320px] md:order-2 md:h-auto md:min-h-0 md:w-[70%] xl:rounded-md">
-      <div class="kd-finder-track absolute inset-0 flex transition-transform duration-700 ease-out" style="transform: translateX(0%)">
-        <img src="{% static 'img/head1-w1280.webp' %}" srcset="{% static 'img/head1-w800.webp' %} 800w, {% static 'img/head1-w1280.webp' %} 1280w" sizes="(min-width: 768px) 70vw, 100vw" alt="خرید نوار تیپ برای آبیاری ردیفی" width="1280" height="853" fetchpriority="high" decoding="async" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover object-[20%_center]">
-        <img src="{% static 'img/head2-w1280.webp' %}" srcset="{% static 'img/head2-w800.webp' %} 800w, {% static 'img/head2-w1280.webp' %} 1280w" sizes="(min-width: 768px) 70vw, 100vw" alt="نوار تیپ و لوازم آبیاری قطره‌ای" width="1280" height="853" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
-        <img src="{% static 'img/drip-banner-w1280.webp' %}" srcset="{% static 'img/drip-banner-w800.webp' %} 800w, {% static 'img/drip-banner-w1280.webp' %} 1280w" sizes="(min-width: 768px) 70vw, 100vw" alt="سامانه آبیاری قطره‌ای کشت‌دریپ" width="1280" height="720" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
-        <img src="{% static 'img/drip-banner2-w1280.webp' %}" srcset="{% static 'img/drip-banner2-w800.webp' %} 800w, {% static 'img/drip-banner2-w1280.webp' %} 1280w" sizes="(min-width: 768px) 70vw, 100vw" alt="خرید لوازم آبیاری از کشت‌دریپ" width="1280" height="720" loading="lazy" decoding="async" draggable="false" class="pointer-events-none h-full w-full min-w-full shrink-0 object-cover">
+    <div class="pointer-events-none absolute inset-y-0 left-0 z-10 w-[34%] md:w-[30%]">
+      <div class="kd-finder-veil absolute inset-y-0 left-0" aria-hidden="true"></div>
+      <div class="relative grid h-full min-h-0 grid-cols-1 grid-rows-2 gap-2 p-2 md:gap-3 md:p-3">
+        <a href="{% url 'catalog' %}" class="kd-finder-card pointer-events-auto relative h-full min-h-0 overflow-hidden shadow-[0_10px_28px_rgba(0,0,0,0.08)] transition hover:shadow-lg">
+          <img src="{% static 'img/head3-w800.webp' %}" alt="خرید لوازم آبیاری کشت‌دریپ" width="800" height="533" loading="lazy" decoding="async" class="h-full w-full object-cover">
+        </a>
+        <a href="{% url 'catalog' %}" class="kd-finder-card pointer-events-auto relative h-full min-h-0 overflow-hidden shadow-[0_10px_28px_rgba(0,0,0,0.08)] transition hover:shadow-lg">
+          <img src="{% static 'img/head4-w800.webp' %}" alt="تجهیزات آبیاری قطره‌ای" width="800" height="533" loading="lazy" decoding="async" class="h-full w-full object-cover">
+        </a>
       </div>
+    </div>
 
-      <button type="button" class="kd-finder-prev absolute left-2 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn" aria-label="اسلاید قبلی">
-        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
-      </button>
-      <button type="button" class="kd-finder-next absolute right-2 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn" aria-label="اسلاید بعدی">
-        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
-      </button>
+    <button type="button" class="kd-finder-prev absolute top-1/2 left-[calc(34%+0.5rem)] z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn md:left-[calc(30%+0.75rem)]" aria-label="اسلاید قبلی">
+      <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+    </button>
+    <button type="button" class="kd-finder-next absolute top-1/2 right-2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:translate-x-1 hover:-translate-y-1/2 hover:scale-125 hover:text-cyanbtn" aria-label="اسلاید بعدی">
+      <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
 
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center bg-gradient-to-t from-black/35 to-transparent pb-4 pt-10">
-        <div class="pointer-events-auto flex items-center gap-1.5" role="tablist" aria-label="اسلایدها">
-          <button type="button" class="kd-finder-dot h-1.5 w-6 rounded-full bg-white transition-all duration-300 ease-out hover:bg-white" data-index="0" aria-label="اسلاید 1"></button>
-          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="1" aria-label="اسلاید 2"></button>
-          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="2" aria-label="اسلاید 3"></button>
-          <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="3" aria-label="اسلاید 4"></button>
-        </div>
+    <div class="pointer-events-none absolute right-0 bottom-0 left-[34%] z-20 flex justify-center bg-gradient-to-t from-black/35 to-transparent pb-4 pt-10 md:left-[30%]">
+      <div class="pointer-events-auto flex items-center gap-1.5" role="tablist" aria-label="اسلایدها">
+        <button type="button" class="kd-finder-dot h-1.5 w-6 rounded-full bg-white transition-all duration-300 ease-out hover:bg-white" data-index="0" aria-label="اسلاید 1"></button>
+        <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="1" aria-label="اسلاید 2"></button>
+        <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="2" aria-label="اسلاید 3"></button>
+        <button type="button" class="kd-finder-dot h-1.5 w-1.5 rounded-full bg-white/45 transition-all duration-300 ease-out hover:bg-white/80" data-index="3" aria-label="اسلاید 4"></button>
       </div>
     </div>
   </div>
