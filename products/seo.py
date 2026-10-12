@@ -91,8 +91,8 @@ def _graph(request, extra=None):
     return _json({"@context": "https://schema.org", "@graph": graph})
 
 
-def pack(request, *, title, description, robots="index, follow", canonical=None, image="", og_type="website", extra_graph=None, heading="", intro=""):
-    return {
+def pack(request, *, title, description, robots="index, follow", canonical=None, image="", og_type="website", extra_graph=None, heading="", intro="", keywords="", published="", modified="", section=""):
+    data = {
         "title": clip(title, 70),
         "description": clip(description, 160),
         "robots": robots,
@@ -103,6 +103,15 @@ def pack(request, *, title, description, robots="index, follow", canonical=None,
         "heading": heading,
         "intro": intro,
     }
+    if keywords:
+        data["keywords"] = keywords
+    if published:
+        data["published"] = published
+    if modified:
+        data["modified"] = modified
+    if section:
+        data["section"] = section
+    return data
 
 
 def _crumbs(request, items):
@@ -135,12 +144,7 @@ def seo_for_request(request):
             heading="درباره کشت‌دریپ",
         )
     if name == "blog":
-        return pack(
-            request,
-            title="راهنمای نوار تیپ و آبیاری قطره‌ای | کشت‌دریپ",
-            description="آموزش انتخاب نوار تیپ، قطعات سامانه و خرید لوازم آبیاری. راهنمای عملی کشت‌دریپ برای مزرعه، باغ و گلخانه.",
-            heading="وبلاگ کشت‌دریپ",
-        )
+        return blog_list_seo(request, all_posts())
     return pack(
         request,
         title=HOME_TITLE,
@@ -278,20 +282,90 @@ def product_seo(request, product, *, price, image="", sku=""):
     )
 
 
+def _schema_datetime(value):
+    value = str(value or "")[:10]
+    if len(value) == 10 and value[4] == "-" and value[7] == "-":
+        return value + "T08:00:00+03:30"
+    return ""
+
+
+def post_lastmod(post):
+    return str(post.get("updated") or post.get("published") or "")[:10]
+
+
+def blog_list_seo(request, posts):
+    url = absolute_url(request, reverse("blog"))
+    description = (
+        "آموزش انتخاب نوار تیپ، تنظیم فشار و طول ردیف، فیلتراسیون، کودآبیاری و نگهداری سامانه قطره‌ای. "
+        "راهنمای عملی کشت‌دریپ برای مزرعه، باغ و گلخانه."
+    )
+    graph = [
+        {
+            "@type": "Blog",
+            "@id": url + "#blog",
+            "name": "وبلاگ کشت‌دریپ",
+            "description": description,
+            "url": url,
+            "inLanguage": "fa",
+            "publisher": {"@id": absolute_url(request, "/") + "#store"},
+        },
+        {
+            "@type": "ItemList",
+            "name": "مقاله‌های آبیاری قطره‌ای",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": index,
+                    "name": post["title"],
+                    "url": absolute_url(request, reverse("blog_detail", kwargs={"slug": post["slug"]})),
+                }
+                for index, post in enumerate(posts, start=1)
+            ],
+        },
+        _crumbs(
+            request,
+            [
+                ("خانه", absolute_url(request, reverse("home"))),
+                ("وبلاگ", url),
+            ],
+        ),
+    ]
+    return pack(
+        request,
+        title="راهنمای آبیاری قطره‌ای و نوار تیپ | کشت‌دریپ",
+        description=description,
+        canonical=url,
+        extra_graph=graph,
+        heading="راهنمای آبیاری قطره‌ای و نوار تیپ",
+        keywords="آبیاری قطره‌ای، نوار تیپ، فیلتر آبیاری، کودآبیاری، لوله پلی‌اتیلن",
+    )
+
+
 def blog_seo(request, post):
     url = absolute_url(request, reverse("blog_detail", kwargs={"slug": post["slug"]}))
     image = absolute_url(request, "/static/" + post["image"]) if post.get("image") else ""
+    published = _schema_datetime(post.get("published"))
+    modified = _schema_datetime(post.get("updated") or post.get("published"))
+    keywords = [item for item in post.get("keywords") or [] if item]
+    description = post.get("meta_description") or post["excerpt"]
     article = {
         "@type": "BlogPosting",
         "headline": post["title"],
-        "description": post["excerpt"],
+        "description": description,
         "inLanguage": "fa",
-        "mainEntityOfPage": url,
-        "author": {"@type": "Organization", "name": SITE_NAME},
+        "mainEntityOfPage": {"@type": "WebPage", "@id": url},
+        "author": {"@type": "Organization", "name": SITE_NAME, "url": absolute_url(request, "/")},
         "publisher": {"@type": "Organization", "name": SITE_NAME},
+        "articleSection": post.get("category") or "آموزش آبیاری",
     }
+    if published:
+        article["datePublished"] = published
+    if modified:
+        article["dateModified"] = modified
     if image:
         article["image"] = image
+    if keywords:
+        article["keywords"] = "، ".join(keywords)
     crumbs = _crumbs(
         request,
         [
@@ -300,14 +374,34 @@ def blog_seo(request, post):
             (post["title"], url),
         ],
     )
+    extra = [article, crumbs]
+    faqs = post.get("faqs") or []
+    if faqs:
+        extra.append(
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": item["q"],
+                        "acceptedAnswer": {"@type": "Answer", "text": item["a"]},
+                    }
+                    for item in faqs
+                ],
+            }
+        )
     return pack(
         request,
-        title=f"{post['title']} | کشت‌دریپ",
-        description=post["excerpt"],
+        title=post.get("seo_title") or f"{post['title']} | کشت‌دریپ",
+        description=description,
         canonical=url,
         image=image,
         og_type="article",
-        extra_graph=[article, crumbs],
+        extra_graph=extra,
+        keywords="، ".join(keywords),
+        published=published,
+        modified=modified,
+        section=post.get("category") or "",
     )
 
 
@@ -330,26 +424,36 @@ def robots_txt(request):
 
 
 def sitemap_xml(request):
+    posts = all_posts()
+    blog_dates = [post_lastmod(post) for post in posts if post_lastmod(post)]
     entries = [
-        (absolute_url(request, reverse("home")), "1.0"),
-        (absolute_url(request, reverse("catalog")), "0.9"),
-        (absolute_url(request, reverse("about")), "0.4"),
-        (absolute_url(request, reverse("blog")), "0.6"),
+        (absolute_url(request, reverse("home")), "1.0", ""),
+        (absolute_url(request, reverse("catalog")), "0.9", ""),
+        (absolute_url(request, reverse("about")), "0.4", ""),
+        (absolute_url(request, reverse("blog")), "0.8", max(blog_dates) if blog_dates else ""),
     ]
     for category in Category.objects.all():
         priority = "0.9" if category.slug == "drip-tape" else "0.7"
-        entries.append((absolute_url(request, category.get_absolute_url()), priority))
+        entries.append((absolute_url(request, category.get_absolute_url()), priority, ""))
     for brand in Brand.objects.all():
-        entries.append((absolute_url(request, brand.get_absolute_url()), "0.5"))
+        entries.append((absolute_url(request, brand.get_absolute_url()), "0.5", ""))
     for product in Product.objects.all().only("slug"):
-        entries.append((absolute_url(request, product.get_absolute_url()), "0.8"))
-    for post in all_posts():
-        entries.append((absolute_url(request, reverse("blog_detail", kwargs={"slug": post["slug"]})), "0.6"))
+        entries.append((absolute_url(request, product.get_absolute_url()), "0.8", ""))
+    for post in posts:
+        entries.append(
+            (
+                absolute_url(request, reverse("blog_detail", kwargs={"slug": post["slug"]})),
+                "0.7",
+                post_lastmod(post),
+            )
+        )
 
     body = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for loc, priority in entries:
+    for loc, priority, lastmod in entries:
         body.append("  <url>")
         body.append(f"    <loc>{escape(loc)}</loc>")
+        if lastmod:
+            body.append(f"    <lastmod>{escape(lastmod)}</lastmod>")
         body.append(f"    <priority>{priority}</priority>")
         body.append("  </url>")
     body.append("</urlset>")

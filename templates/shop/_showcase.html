@@ -5,7 +5,7 @@
     <div class="kd-showcase-track flex transition-transform duration-500 ease-out" style="transform: translateX(0%)">
       {% for slide in showcase %}
         <a href="{{ slide.category.get_absolute_url }}" class="relative min-h-[200px] w-full min-w-full shrink-0 sm:min-h-[280px] md:min-h-[360px]" aria-label="{{ slide.category.name }}">
-          <img src="{{ slide.image_url }}" alt="{{ slide.category.name }}" class="absolute inset-0 h-full w-full object-cover">
+          <img src="{{ slide.image_url }}" alt="{{ slide.category.name }}" width="1280" height="456" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
           <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
           <div class="absolute inset-x-0 bottom-0 z-10 p-5 pr-16 text-right text-white sm:p-8 sm:pr-20" dir="rtl">
             <strong class="mt-1 block text-xl font-bold sm:text-3xl ">{{ slide.category.name }}</strong>

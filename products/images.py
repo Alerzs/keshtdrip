@@ -10,17 +10,35 @@ def image_src(value):
         return ""
     if value.startswith(("http://", "https://")):
         return value
-    prefix = settings.STATIC_URL
-    if value.startswith(prefix):
-        relative = value[len(prefix) :]
-    elif value.startswith("/"):
-        return value
-    else:
-        relative = value.lstrip("/")
+    relative = _static_relative(value)
+    if not relative:
+        return value if value.startswith("/") else ""
     try:
         return static(relative)
     except ValueError:
-        return prefix + relative
+        return settings.STATIC_URL + relative
+
+
+def image_fit(value, width):
+    relative = _static_relative(value)
+    if relative:
+        path = Path(relative)
+        variant = path.with_name(f"{path.stem}-w{int(width)}.webp").as_posix()
+        if _static_file(variant) is not None:
+            return image_src(variant)
+    return image_src(value)
+
+
+def _static_relative(value):
+    value = (value or "").strip()
+    if not value or value.startswith(("http://", "https://")):
+        return ""
+    prefix = settings.STATIC_URL
+    if value.startswith(prefix):
+        return value[len(prefix) :]
+    if value.startswith("/"):
+        return ""
+    return value.lstrip("/")
 
 
 def sibling_image_urls(url):
@@ -46,12 +64,25 @@ def sibling_image_urls(url):
     return extras
 
 
-def _static_dir(relative):
+def _static_roots():
     roots = [Path(root) for root in settings.STATICFILES_DIRS]
     static_root = getattr(settings, "STATIC_ROOT", None)
     if static_root:
         roots.append(Path(static_root))
-    for root in roots:
+    return roots
+
+
+def _static_file(relative):
+    relative = Path(relative)
+    for root in _static_roots():
+        file = root / relative
+        if file.is_file():
+            return file
+    return None
+
+
+def _static_dir(relative):
+    for root in _static_roots():
         folder = root / relative
         if folder.is_dir():
             return folder

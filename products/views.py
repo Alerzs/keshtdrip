@@ -1,13 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from . import cart as cart_store
-from .blog_posts import all_posts, get_post
-from .images import image_src, sibling_image_urls
+from .blog_posts import all_posts, featured_posts, get_post, grouped_posts, related_posts
+from .images import image_fit, image_src, sibling_image_urls
 from .models import Brand, Category, Product, ProductVariant
 from .seo import PRIVATE_DESCRIPTION, absolute_url, attach, blog_seo, catalog_seo, pack, product_seo
 
@@ -122,30 +123,39 @@ def _featured_variants(in_cart_ids=None):
     return variants.order_by("product__name", "sort_order", "id")
 
 
+HOME_CACHE_KEY = "shop-home-v1"
+HOME_RAIL_LIMIT = 12
+
+
+def _home_rail(qs):
+    return list(qs[:HOME_RAIL_LIMIT])
+
+
 def home(request):
-    categories = list(Category.objects.all())
-    featured = _featured_variants()
-    fresh = _catalog().order_by("-created_at")
-    showcase = [
-        {"category": cat, "image_url": image_src(cat.showcase_image)}
-        for cat in categories
-        if cat.showcase_image
-    ]
-    return render(
-        request,
-        "shop/home.html",
-        {
+    try:
+        payload = cache.get(HOME_CACHE_KEY)
+    except Exception:
+        cache.delete(HOME_CACHE_KEY)
+        payload = None
+    if payload is None:
+        categories = list(Category.objects.all())
+        payload = {
             "categories": categories,
-            "featured": featured,
-            "fresh": fresh,
-            "showcase": showcase,
-            "pipes": _catalog(Product.objects.filter(category__slug="layflat")),
-            "tapes": _catalog(Product.objects.filter(category__slug="drip-tape")),
-            "drips": _catalog(Product.objects.filter(category__slug="irrigation")),
-            "joints": _catalog(Product.objects.filter(category__slug="joints")),
-            "blog_posts": all_posts(),
-        },
-    )
+            "featured": _home_rail(_featured_variants()),
+            "fresh": _home_rail(_catalog().order_by("-created_at")),
+            "showcase": [
+                {"category": cat, "image_url": image_fit(cat.showcase_image, 1280)}
+                for cat in categories
+                if cat.showcase_image
+            ],
+            "pipes": _home_rail(_catalog(Product.objects.filter(category__slug="layflat"))),
+            "tapes": _home_rail(_catalog(Product.objects.filter(category__slug="drip-tape"))),
+            "drips": _home_rail(_catalog(Product.objects.filter(category__slug="irrigation"))),
+            "joints": _home_rail(_catalog(Product.objects.filter(category__slug="joints"))),
+            "blog_posts": featured_posts(6),
+        }
+        cache.set(HOME_CACHE_KEY, payload, 120)
+    return render(request, "shop/home.html", payload)
 
 
 def catalog(request):
@@ -330,7 +340,7 @@ def about(request):
 
 
 def blog_list(request):
-    return render(request, "shop/blog.html", {"posts": all_posts()})
+    return render(request, "shop/blog.html", {"groups": grouped_posts(), "post_count": len(all_posts())})
 
 
 def blog_detail(request, slug):
@@ -341,7 +351,7 @@ def blog_detail(request, slug):
     return render(
         request,
         "shop/blog_post.html",
-        {"post": post, "posts": [p for p in all_posts() if p["slug"] != slug]},
+        {"post": post, "related": related_posts(post)},
     )
 
 

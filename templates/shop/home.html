@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
+<h1 class="sr-only">{{ seo.heading }}</h1>
 <section class="flex flex-col gap-y-4 py-4 lg:gap-y-8">
   <section class="mx-auto w-full max-w-[1440px] px-4 xl:px-20">
     {% include "shop/_finder.html" %}
   </section>
 
   {% include "shop/_rail.html" with variants=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
-  {% include "shop/_rail.html" with products=pipes title="انواع لوله های نخ دار" more_url="/shop/?category=layflat" %}
+  {% include "shop/_rail.html" with products=pipes single_variant=True title="انواع لوله های نخ دار" more_url="/shop/?category=layflat" %}
 
   {% include "shop/_showcase.html" %}
-  {% include "shop/_rail.html" with products=tapes title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
+  {% include "shop/_rail.html" with products=tapes single_variant=True title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
   {% if categories %}
   <div class="mx-auto grid w-full max-w-[1440px] grid-cols-6 gap-2 overflow-hidden px-4 md:gap-4 xl:px-20">
     {% for cat in categories|slice:":5" %}
@@ -20,9 +21,9 @@
   </div>
   {% endif %}
 
-  {% include "shop/_rail.html" with products=fresh title="همه محصولات" more_url="/shop/" %}
-  {% include "shop/_rail.html" with products=drips title="محصولات آبیاری" more_url="/shop/?category=irrigation/" %}
-  {% include "shop/_rail.html" with products=joints title="اتصالات" more_url="/shop/?category=joints" %}
+  {% include "shop/_rail.html" with products=fresh single_variant=True title="همه محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=drips single_variant=True title="محصولات آبیاری" more_url="/shop/?category=irrigation" %}
+  {% include "shop/_rail.html" with products=joints single_variant=True title="اتصالات" more_url="/shop/?category=joints" %}
   {% if blog_posts %}
     {% include "shop/_blog_special.html" %}
   {% endif %}

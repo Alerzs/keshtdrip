@@ -2,25 +2,56 @@
 {% load static %}
 {% block content %}
 <section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
+  <nav class="mb-5 text-sm text-slate-400" aria-label="مسیر">
+    <a class="hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
+    <span class="mx-1">/</span>
+    <span class="text-slate-600">وبلاگ</span>
+  </nav>
   <p class="mb-2 text-sm font-medium text-cyanbtn">آموزش و راهنما</p>
-  <h1 class="mb-3 text-2xl font-bold">وبلاگ کشت‌دریپ</h1>
-  <p class="mb-8 max-w-3xl leading-8 text-slate-600">نکات عملی درباره آبیاری قطره‌ای، انتخاب قطعات و مدیریت آب در مزرعه و باغ.</p>
-  <div class="grid gap-4 md:grid-cols-2">
-    {% for post in posts %}
-      <article class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-cyanbtn">
-        {% if post.image %}
-          <a href="{% url 'blog_detail' post.slug %}" class="block overflow-hidden">
-            <img src="{% static post.image %}" alt="{{ post.title }}" class="h-40 w-full object-cover">
-          </a>
-        {% endif %}
-        <div class="flex flex-1 flex-col p-5">
-        <p class="mb-2 text-xs text-slate-400">{{ post.category }} · {{ post.date }} · {{ post.read_minutes }} دقیقه مطالعه</p>
-        <h2 class="mb-2 text-lg font-bold"><a class="hover:text-cyanbtn" href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h2>
-        <p class="mb-4 grow leading-7 text-slate-500">{{ post.excerpt }}</p>
-        <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' post.slug %}">ادامه مطلب</a>
-        </div>
-      </article>
+  <h1 class="mb-3 text-2xl font-bold leading-10 md:text-3xl">راهنمای آبیاری قطره‌ای و نوار تیپ</h1>
+  <div class="mb-6 max-w-3xl space-y-4 leading-8 text-slate-600">
+    <p>اینجا روش انتخاب نوار تیپ، تنظیم فشار و طول ردیف، فیلتراسیون، سایز لوله، بستن اتصالات و کودآبیاری را با زبان مزرعه نوشته‌ایم. هر راهنما به قطعه‌ای وصل است که در فروشگاه کشت‌دریپ با مشخصات فنی و قیمت روز می‌توانید ببینید.</p>
+    <p>اگر سامانه را از صفر می‌چینید، از <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-irrigation-advantages-and-components' %}">معرفی قطعات آبیاری قطره‌ای</a> شروع کنید. برای خرید نوار، <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'how-to-choose-drip-tape' %}">فاصله قطره‌چکان و ضخامت</a> را با <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-tape-pressure-and-row-length' %}">فشار کار و طول ردیف</a> با هم بسنجید. آب چاه یا استخر هم بدون <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-filter-mesh-vs-disc' %}">فیلتر مناسب</a> قطره‌چکان را زود می‌بندد.</p>
+  </div>
+  <p class="mb-8 text-sm text-slate-400">{{ post_count }} راهنما · مزرعه، باغ و گلخانه</p>
+
+  <nav class="mb-10 flex flex-wrap gap-2" aria-label="موضوع‌های راهنما">
+    {% for group in groups %}
+      <a class="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:border-cyanbtn hover:text-cyanbtn" href="#{{ group.slug }}">{{ group.name }}</a>
     {% endfor %}
+  </nav>
+
+  {% for group in groups %}
+    <section id="{{ group.slug }}" class="mb-12 scroll-mt-28">
+      <h2 class="mb-2 text-xl font-bold">{{ group.name }}</h2>
+      <p class="mb-5 max-w-3xl leading-8 text-slate-600">{{ group.intro }}</p>
+      <div class="grid gap-4 md:grid-cols-2">
+        {% for post in group.posts %}
+          <article class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-cyanbtn">
+            {% if post.image %}
+              <a href="{% url 'blog_detail' post.slug %}" class="block overflow-hidden">
+                <img src="{% static post.image %}" alt="{{ post.image_alt|default:post.title }}" width="640" height="360" loading="lazy" decoding="async" class="h-40 w-full object-cover">
+              </a>
+            {% endif %}
+            <div class="flex flex-1 flex-col p-5">
+              <p class="mb-2 text-xs text-slate-400">
+                <time datetime="{{ post.published }}">{{ post.date }}</time>
+                · {{ post.read_minutes }} دقیقه مطالعه
+              </p>
+              <h3 class="mb-2 text-lg font-bold"><a class="hover:text-cyanbtn" href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h3>
+              <p class="mb-4 grow leading-7 text-slate-500">{{ post.excerpt }}</p>
+              <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' post.slug %}">ادامه مطلب</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+
+  <div class="max-w-3xl rounded-2xl border border-cyanbtn/20 bg-header p-6">
+    <h2 class="mb-2 text-lg font-bold">قطعه را بعد از خواندن راهنما انتخاب کنید</h2>
+    <p class="mb-4 leading-8 text-slate-600">نوار تیپ، لوله، فیلتر و اتصالات کشت‌دریپ با مشخصات فنی کنار هم هستند. اگر بین دو سایز مردد هستید، قبل از سفارش مشاوره بگیرید تا فشار و دبی زون با قطعه یکی باشد.</p>
+    <a class="inline-flex rounded-xl bg-cyanbtn px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyanbtnHover" href="{% url 'catalog' %}">ورود به فروشگاه</a>
   </div>
 </section>
 {% endblock %}

@@ -85,6 +85,8 @@ That loads `config.wsgi:application`.
 
 ## 6. After deploy — quick checks
 
+PageSpeed should be run on `https://keshtdrip.ir/` (the final address). The host already redirects `http://` to that URL in one hop. Django sends an HSTS header in production so a browser that has visited the site once does not try `http://` again.
+
 - Home page loads and CSS is applied (header green, Vazirmatn).
 - `/static/css/output.css` returns 200.
 - Uploaded images under `/media/` work only if the host keeps `media/` on disk.

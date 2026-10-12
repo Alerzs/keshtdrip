@@ -3,6 +3,14 @@
 @source "../templates/**/*.html";
 @source not "../static/css/output.css";
 
+@font-face {
+  font-family: Vazirmatn;
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/Vazirmatn-wght.woff2") format("woff2");
+}
+
 @theme {
   --font-sans: "Vazirmatn", "Tahoma", "Arial", sans-serif;
   --color-header: #f1fdf4;

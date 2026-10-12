@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import sys
 from dotenv import load_dotenv
 
 
@@ -32,6 +33,9 @@ if not DEBUG:
     USE_X_FORWARDED_HOST = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 180
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
 
 
 
@@ -118,6 +122,22 @@ STORAGES = {
         ),
     },
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": str(BASE_DIR / ".cache"),
+        "TIMEOUT": 120,
+        "OPTIONS": {"MAX_ENTRIES": 200},
+    }
+}
+if "test" in sys.argv:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
 
 
 MAILERS = {

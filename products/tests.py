@@ -158,6 +158,12 @@ class SeoTests(TestCase):
         html = response.content.decode()
         self.assertEqual(html.count("<h1"), 1)
         self.assertGreaterEqual(html.count("<h2"), 1)
+        self.assertNotIn("fonts.googleapis.com", html)
+        self.assertIn("keshtdrip.webp", html)
+        self.assertIn("Vazirmatn-wght.woff2", html)
+        self.assertIn('loading="lazy"', html)
+        self.assertIn('fetchpriority="high"', html)
+        self.assertEqual(response.status_code, 200)
 
     def test_drip_tape_catalog_title_and_heading(self):
         Category.objects.create(name="نوار تیپ", slug="drip-tape", tagline="نوار تیپ آبیاری")
@@ -195,6 +201,28 @@ class SeoTests(TestCase):
         self.assertContains(sitemap, "category=drip-tape")
         self.assertContains(sitemap, "/product/seo-tape/")
         self.assertContains(sitemap, "/blog/how-to-choose-drip-tape/")
+
+    def test_blog_index_and_article_schema(self):
+        index = self.client.get(reverse("blog"))
+        self.assertContains(index, "راهنمای آبیاری قطره‌ای و نوار تیپ")
+        self.assertContains(index, "ItemList")
+        self.assertContains(index, "drip-tape-pressure-and-row-length")
+        self.assertContains(index, "قیمت نوار تیپ به چه چیزی بستگی دارد")
+        html = index.content.decode()
+        self.assertEqual(html.count("<h1"), 1)
+
+        article = self.client.get(reverse("blog_detail", args=["how-to-choose-drip-tape"]))
+        self.assertContains(article, "BlogPosting")
+        self.assertContains(article, "FAQPage")
+        self.assertContains(article, "datePublished")
+        self.assertContains(article, "article:published_time")
+        self.assertContains(article, "پرسش‌های پرتکرار")
+        article_html = article.content.decode()
+        self.assertEqual(article_html.count("<h1"), 1)
+
+        sitemap = self.client.get(reverse("sitemap"))
+        self.assertContains(sitemap, "<lastmod>2026-10-10</lastmod>")
+        self.assertContains(sitemap, "/blog/greenhouse-drip-irrigation/")
 
     def test_product_schema_uses_rial(self):
         category = Category.objects.create(name="نوار تیپ", slug="seo-tape-cat", tagline="نوار")
