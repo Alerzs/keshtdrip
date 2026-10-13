@@ -14,15 +14,15 @@
   </nav>
   <h1 class="mb-2 text-2xl font-bold">{{ seo.heading }}</h1>
   <div class="mb-6 text-slate-500">{% if seo.intro %}{{ seo.intro }}{% elif active_category %}{{ active_category.tagline }}{% else %}گروه محصول را انتخاب کنید یا نام کالا را جستجو کنید.{% endif %}</div>
-  <form class="mb-6 flex max-w-xl gap-2" action="{% url 'catalog' %}" method="get">
+  <form class="mb-6 flex max-w-xl flex-col gap-2 sm:flex-row" action="{% url 'catalog' %}" method="get">
     {% if active_category %}
       <input type="hidden" name="category" value="{{ active_category.slug }}">
     {% endif %}
     {% if active_brand %}
       <input type="hidden" name="brand" value="{{ active_brand.slug }}">
     {% endif %}
-    <input class="h-[45px] flex-1 rounded-md border border-slate-200 bg-white px-3 outline-none" type="search" name="q" value="{{ query }}" placeholder="جستجوی محصول…">
-    <button class="rounded-full bg-cyanbtn px-6 font-bold text-white hover:bg-cyanbtnHover" type="submit">جستجو</button>
+    <input class="h-[45px] min-w-0 w-full flex-1 rounded-md border border-slate-200 bg-white px-3 outline-none" type="search" name="q" value="{{ query }}" placeholder="جستجوی محصول…">
+    <button class="h-[45px] shrink-0 rounded-full bg-cyanbtn px-6 font-bold text-white hover:bg-cyanbtnHover" type="submit">جستجو</button>
   </form>
   <div class="mb-4 flex flex-wrap gap-2">
     <a class="rounded-xl border px-3 py-2 text-sm {% if not active_category %}border-emerald-500 bg-emerald-50 text-emerald-700{% else %}border-slate-200 bg-white text-slate-500{% endif %}" href="{% if active_brand %}{{ active_brand.get_absolute_url }}{% else %}{% url 'catalog' %}{% endif %}">همه</a>

@@ -11,9 +11,9 @@
   {% include "shop/_showcase.html" %}
   {% include "shop/_rail.html" with products=tapes single_variant=True title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
   {% if categories %}
-  <div class="mx-auto grid w-full max-w-[1440px] grid-cols-6 gap-2 overflow-hidden px-4 md:gap-4 xl:px-20">
+  <div class="mx-auto grid w-full max-w-[1440px] grid-cols-2 gap-2 overflow-hidden px-4 md:grid-cols-6 md:gap-4 xl:px-20">
     {% for cat in categories|slice:":5" %}
-      <a href="{{ cat.get_absolute_url }}" class="{% cycle 'col-span-3' 'col-span-3' 'col-span-2' 'col-span-2' 'col-span-2' %} group block overflow-hidden rounded-xl transition duration-300 ease-out hover:opacity-90">
+      <a href="{{ cat.get_absolute_url }}" class="{% cycle 'md:col-span-3' 'md:col-span-3' 'md:col-span-2' 'md:col-span-2' 'col-span-2 md:col-span-2' %} group block overflow-hidden rounded-xl transition duration-300 ease-out hover:opacity-90">
         {% image_alt "تصویر دسته" cat.name "" forloop.counter as cat_alt %}
         {% include "shop/_media.html" with src=cat.image alt=cat_alt label=cat.name size="category" %}
       </a>

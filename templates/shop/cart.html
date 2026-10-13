@@ -17,7 +17,7 @@
                   </button>
                 </form>
                 <div class="flex items-stretch gap-3 sm:gap-5">
-                  <div class="flex w-[120px] shrink-0 flex-col sm:w-[130px]">
+                  <div class="flex w-[96px] shrink-0 flex-col sm:w-[130px]">
                     <a class="mb-2 block overflow-hidden rounded-lg bg-slate-50" href="{% if item.variant %}{{ item.variant.get_absolute_url }}{% else %}{{ item.product.get_absolute_url }}{% endif %}">
                       {% include "shop/_media.html" with src=item.product.image alt=item.product.name label="تصویر" size="basket" %}
                     </a>
@@ -104,7 +104,7 @@
           <span class="block text-xs text-slate-500">مبلغ قابل پرداخت</span>
           <strong class="text-base">{{ total|fa_num }} تومان</strong>
         </div>
-        <a class="inline-flex h-12 min-w-[160px] items-center justify-center rounded-xl bg-cyanbtn px-5 font-bold text-white hover:bg-cyanbtnHover" href="{% if user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'account' %}?next={% url 'checkout' %}{% endif %}">ادامه خرید</a>
+        <a class="inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-cyanbtn px-4 font-bold text-white hover:bg-cyanbtnHover" href="{% if user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'account' %}?next={% url 'checkout' %}{% endif %}">ادامه خرید</a>
       </div>
     </div>
   {% else %}

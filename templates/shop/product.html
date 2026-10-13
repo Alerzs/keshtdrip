@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load persian %}
 {% block content %}
-<nav class="mx-auto max-w-[1440px] px-4 pt-8 text-sm text-slate-400 xl:px-20" aria-label="مسیر صفحه">
+<nav class="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-1 gap-y-1 px-4 pt-8 text-sm break-words text-slate-400 xl:px-20" aria-label="مسیر صفحه">
   <a class="hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
   <span class="mx-1">/</span>
   <a class="hover:text-cyanbtn" href="{% url 'catalog' %}">خرید لوازم آبیاری</a>
