@@ -193,7 +193,18 @@ def catalog_seo(request, *, category, brand, query, products):
         )
         return seo
 
-    if category and category.slug == "drip-tape":
+    if category and category.slug == "drip-tape" and brand:
+        title = f"خرید نوار تیپ {brand.name} | کشت‌دریپ"
+        description = (
+            f"خرید نوار تیپ برند {brand.name} با قیمت روز. "
+            "پلاکدار و درزدار در فاصله ۱۰، ۲۰ و ۳۰ سانتی‌متر، مشاوره انتخاب ضخامت و ارسال به سراسر ایران."
+        )
+        heading = f"خرید نوار تیپ {brand.name}"
+        intro = (
+            f"نوار تیپ {brand.name} را با فاصله قطره‌چکان ۱۰، ۲۰ و ۳۰ سانتی‌متر "
+            "و ضخامت مناسب نوع کشت و طول ردیف از کشت‌دریپ سفارش دهید."
+        )
+    elif category and category.slug == "drip-tape":
         title = TAPE_TITLE
         description = TAPE_DESCRIPTION
         heading = "خرید نوار تیپ"

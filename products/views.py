@@ -176,8 +176,6 @@ def home(request):
             ],
             "pipes": _home_rail(_catalog(Product.objects.filter(category__slug="layflat"))),
             "tapes": _home_rail(_catalog(Product.objects.filter(category__slug="drip-tape"))),
-            "drips": _home_rail(_catalog(Product.objects.filter(category__slug="irrigation"))),
-            "joints": _home_rail(_catalog(Product.objects.filter(category__slug="joints"))),
             "blog_posts": featured_posts(6),
         }
         cache.set(HOME_CACHE_KEY, payload, 120)

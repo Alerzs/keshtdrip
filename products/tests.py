@@ -260,6 +260,22 @@ class SeoTests(TestCase):
         self.assertContains(response, "خرید نوار تیپ")
         self.assertContains(response, "index, follow")
 
+    def test_drip_tape_brand_pages_have_distinct_titles(self):
+        Category.objects.create(name="نوار تیپ", slug="drip-tape", tagline="نوار تیپ آبیاری")
+        Brand.objects.create(name="خوشه چین", slug="خوشه-چین")
+        Brand.objects.filter(slug="keshtdrip").update(name="کشت‌دریپ")
+        category = self.client.get(reverse("catalog") + "?category=drip-tape")
+        khooshe = self.client.get(reverse("catalog") + "?category=drip-tape&brand=خوشه-چین")
+        own = self.client.get(reverse("catalog") + "?category=drip-tape&brand=keshtdrip")
+        self.assertContains(category, "خرید نوار تیپ | کشت‌دریپ")
+        self.assertContains(category, "خرید نوار تیپ پلاکدار و درزدار در فاصله")
+        self.assertContains(khooshe, "خرید نوار تیپ خوشه چین | کشت‌دریپ")
+        self.assertContains(khooshe, "خرید نوار تیپ برند خوشه چین با قیمت روز")
+        self.assertContains(own, "خرید نوار تیپ کشت‌دریپ | کشت‌دریپ")
+        self.assertContains(own, "خرید نوار تیپ برند کشت‌دریپ با قیمت روز")
+        self.assertNotContains(khooshe, "خرید نوار تیپ | کشت‌دریپ")
+        self.assertNotContains(own, "خرید نوار تیپ پلاکدار و درزدار در فاصله")
+
     def test_shop_and_search_robots(self):
         shop = self.client.get(reverse("catalog"))
         self.assertContains(shop, "خرید لوازم آبیاری | کشت‌دریپ")

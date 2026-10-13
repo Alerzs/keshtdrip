@@ -185,7 +185,6 @@ EXTRA_POSTS = [
         "closing": "فیلتر مناسب و شیر تخلیه انتها، دو قطعه‌ای هستند که هزینه تعویض نوار را در فصل کم می‌کنند. اگر هنوز ایستگاه فیلتراسیون ندارید، قبل از پهن کردن رول بعدی نوع آب را مشخص کنید.",
         "cta_label": "مشاهده فیلترها",
         "cta_url_name": "catalog",
-        "cta_query": "irrigation",
     },
     {
         "slug": "greenhouse-drip-irrigation",
@@ -353,7 +352,6 @@ EXTRA_POSTS = [
         "closing": "برای باغ، لوله پلی‌اتیلن، قطره‌چکان و فیلتر را با تعداد درخت و شیب قطعه انتخاب کنید. نوار تیپ را برای کشت ردیفی همان سال نگه دارید.",
         "cta_label": "مشاهده لوازم آبیاری",
         "cta_url_name": "catalog",
-        "cta_query": "irrigation",
     },
     {
         "slug": "drip-irrigation-schedule",
