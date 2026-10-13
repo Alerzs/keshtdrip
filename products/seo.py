@@ -145,7 +145,17 @@ def seo_for_request(request):
         )
     if name == "blog":
         return blog_list_seo(request, all_posts())
-    return pack(
+    if name == "home_amp":
+        return pack(
+            request,
+            title=HOME_TITLE,
+            description=HOME_DESCRIPTION,
+            canonical=absolute_url(request, reverse("home")),
+            image=absolute_url(request, "/static/img/drip-banner.png"),
+            heading=HOME_HEADING,
+            intro=HOME_INTRO,
+        )
+    seo = pack(
         request,
         title=HOME_TITLE,
         description=HOME_DESCRIPTION,
@@ -153,6 +163,9 @@ def seo_for_request(request):
         heading=HOME_HEADING,
         intro=HOME_INTRO,
     )
+    if name == "home":
+        seo["amphtml"] = absolute_url(request, reverse("home_amp"))
+    return seo
 
 
 def catalog_seo(request, *, category, brand, query, products):

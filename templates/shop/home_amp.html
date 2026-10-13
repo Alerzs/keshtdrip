@@ -1,0 +1,64 @@
+{% load static %}
+<!doctype html>
+<html amp lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <title>{{ seo.title }}</title>
+  <link rel="canonical" href="{{ seo.canonical }}">
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <meta name="description" content="{{ seo.description }}">
+  <link rel="icon" href="{% static 'img/fav.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="alternate" hreflang="fa-IR" href="{{ seo.canonical }}">
+  <link rel="alternate" hreflang="x-default" href="{{ seo.canonical }}">
+  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  <style amp-custom>
+    body{margin:0;background:#f7fff8;color:#202021;font-family:Tahoma,sans-serif;line-height:1.9}
+    header,main,footer{padding:20px}
+    a{color:#2e7d32;text-decoration:none}
+    h1{font-size:1.6rem;line-height:1.6;margin:0 0 12px}
+    h2{font-size:1.15rem;margin:24px 0 8px}
+    .lead{color:#475569}
+    .box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-top:12px}
+    ul{margin:0;padding-right:18px}
+    li{margin:6px 0}
+    footer{background:#0b1220;color:#cbd5e1}
+    footer a{color:#86efac}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="{{ seo.canonical }}">کشت‌دریپ</a>
+  </header>
+  <main>
+    <h1>{{ seo.heading }}</h1>
+    <p class="lead">کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است. نوار پلاکدار و نوار درزدار با فاصله‌های رایج عرضه می‌شود. لوله پلی‌اتیلن برای خط ثابت کنار این نوارها هست. لوله نخدار برای انشعاب موقت مناسب است. فیلتر، شن و جلبک را پیش از قطره‌چکان می‌گیرد. اتصالات، مسیر و زون را کامل می‌کنند. هر کالا مشخصات فنی و قیمت روز دارد. می‌توانید پیش از خرید مشاوره رایگان بگیرید. انتخاب درست، مصرف آب مزرعه را کمتر می‌کند. یکنواختی رطوبت در طول ردیف بیشتر می‌شود. سفارش به شهرهای ایران ارسال می‌شود.</p>
+    <h2>خرید از فروشگاه</h2>
+    <div class="box">
+      <ul>
+        <li><a href="{% url 'catalog' %}">خرید لوازم آبیاری</a></li>
+        <li><a href="{% url 'catalog' %}?category=drip-tape">خرید نوار تیپ</a></li>
+        <li><a href="{% url 'about' %}">درباره کشت‌دریپ</a></li>
+        {% for cat in categories %}
+          <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% if blog_posts %}
+      <h2>راهنمای آبیاری قطره‌ای</h2>
+      <div class="box">
+        <ul>
+          {% for post in blog_posts %}
+            <li><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    <div><a href="{{ seo.canonical }}">مشاهده نسخه کامل سایت</a></div>
+  </main>
+  <footer>
+    <div>کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است.</div>
+  </footer>
+</body>
+</html>

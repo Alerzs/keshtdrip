@@ -92,7 +92,7 @@
             </li>
           </ul>
         </div>
-        <p class="mt-2 rounded-lg bg-[#e8f4fd] p-2 text-right text-xs leading-6 text-sky-800">کالاهای موجود در سبد کالای شما هنوز ثبت و رزرو نشده است، برای ثبت سفارش مراحل بعدی را تکمیل کنید</p>
+        <div class="mt-2 rounded-lg bg-[#e8f4fd] p-2 text-right text-xs leading-6 text-sky-800">کالاهای سبد هنوز ثبت و رزرو نشده است. برای ثبت سفارش، مراحل بعدی را تکمیل کنید.</div>
       </aside>
     </div>
 
@@ -109,7 +109,7 @@
     </div>
   {% else %}
     <div class="rounded-xl border border-slate-200 bg-white p-8 text-center">
-      <p class="mb-5 text-slate-500">سبد خرید خالی است.</p>
+      <div class="mb-5 text-slate-500">سبد خرید خالی است.</div>
       <a class="inline-flex rounded-full bg-cyanbtn px-8 py-3 font-bold text-white hover:bg-cyanbtnHover" href="{% url 'catalog' %}">بازگشت به فروشگاه</a>
     </div>
     {% include "shop/_cart_featured.html" %}

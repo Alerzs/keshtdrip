@@ -1,14 +1,14 @@
 {% if variants %}
   {% for variant in variants %}
-    {% include "shop/_card.html" with product=variant.product variant=variant layout=layout %}
+    {% include "shop/_card.html" with product=variant.product variant=variant layout=layout image_index=forloop.counter %}
   {% endfor %}
 {% else %}
   {% for product in products %}
     {% if single_variant %}
-      {% include "shop/_card.html" with product=product variant=product.featured_box layout=layout %}
+      {% include "shop/_card.html" with product=product variant=product.featured_box layout=layout image_index=forloop.counter %}
     {% else %}
       {% for variant in product.listing_boxes %}
-        {% include "shop/_card.html" with product=product variant=variant layout=layout %}
+        {% include "shop/_card.html" with product=product variant=variant layout=layout image_index=forloop.counter %}
       {% endfor %}
     {% endif %}
   {% endfor %}

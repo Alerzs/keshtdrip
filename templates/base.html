@@ -37,6 +37,12 @@
   <script type="application/ld+json">{{ seo.json_ld }}</script>
   <link rel="preload" href="{% static 'fonts/Vazirmatn-wght.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="icon" href="{% static 'img/fav.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="alternate" hreflang="fa-IR" href="{{ seo.canonical }}">
+  <link rel="alternate" hreflang="x-default" href="{{ seo.canonical }}">
+  {% if seo.amphtml %}
+    <link rel="amphtml" href="{{ seo.amphtml }}">
+  {% endif %}
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
 <body class="min-h-screen bg-[#f7fff8] font-sans text-[#202021] antialiased">
@@ -130,26 +136,26 @@
       <div class="mx-auto grid max-w-[1440px] grid-cols-2 gap-3 px-4 py-8 sm:grid-cols-4 xl:px-20">
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
           <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>
-          <h3 class="text-sm font-medium text-white">ارسال ویژه</h3>
+          <div class="text-sm font-medium text-white">ارسال ویژه</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
           <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.9v-3a2 2 0 0 0-2-2h-1"/><path d="M2 16.9V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8.9"/><path d="M6 19a2 2 0 0 0 4 0M14 19a2 2 0 0 0 4 0"/></svg>
-          <h3 class="text-sm font-medium text-white">پشتیبانی ۲۴ ساعته</h3>
+          <div class="text-sm font-medium text-white">پشتیبانی ۲۴ ساعته</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
           <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h13v10H3z"/><path d="m9 10 2 2 4-4"/></svg>
-          <h3 class="text-sm font-medium text-white">۷ روز ضمانت بازگشت</h3>
+          <div class="text-sm font-medium text-white">۷ روز ضمانت بازگشت</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
           <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z"/></svg>
-          <h3 class="text-sm font-medium text-white">ضمانت اصالت کالا</h3>
+          <div class="text-sm font-medium text-white">ضمانت اصالت کالا</div>
         </div>
       </div>
     </section>
     <section>
       <div class="mx-auto grid max-w-[1440px] grid-cols-1 gap-10 px-4 py-10 md:grid-cols-3 xl:px-20">
         <section class="flex min-w-0 flex-col gap-4">
-          <h3 class="text-base font-bold text-white">دسترسی سریع</h3>
+          <div class="text-base font-bold text-white">دسترسی سریع</div>
           <ul class="flex flex-col gap-3 text-sm">
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'about' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>درباره ما</span></a></li>
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'blog' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>وبلاگ</span></a></li>
@@ -159,25 +165,25 @@
           </ul>
         </section>
         <section class="flex min-w-0 flex-col gap-4">
-          <h3 class="text-base font-bold text-white">قوانین</h3>
+          <div class="text-base font-bold text-white">قوانین</div>
           <ul class="flex flex-col gap-3 text-sm">
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'about' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>قوانین و مقررات</span></a></li>
             <li><a class="inline-flex items-center gap-2 transition hover:text-cyanbtn" href="{% url 'about' %}"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg><span>سیاست حریم خصوصی</span></a></li>
           </ul>
         </section>
         <section class="flex min-w-0 flex-col gap-4">
-          <h3 class="text-base font-bold text-white">ارتباط با ما</h3>
-          <p class="text-sm leading-7 text-slate-400">مشاوره رایگان پیش از خرید و ارسال سریع به سراسر کشور.</p>
+          <div class="text-base font-bold text-white">ارتباط با ما</div>
+          <div class="text-sm leading-7 text-slate-400">مشاوره رایگان پیش از خرید و ارسال سریع به سراسر کشور.</div>
         </section>
       </div>
     </section>
     <section class="border-t border-white/10 bg-[#080d18]">
       <div class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
         <article class="flex min-w-0 flex-col gap-3">
-          <h3 class="font-bold text-white">معرفی فروشگاه</h3>
-          <p class="max-w-3xl text-sm leading-7 text-slate-400">کشت‌دریپ مرجع خرید نوار تیپ و خرید لوازم آبیاری قطره‌ای در ایران است. نوار تیپ پلاکدار و درزدار، لوله، فیلتر و اتصالات را با مشخصات فنی شفاف سفارش دهید تا مصرف آب کمتر و یکنواختی آبیاری بیشتر شود.</p>
+          <div class="font-bold text-white">معرفی فروشگاه</div>
+          <p class="max-w-3xl text-sm leading-7 text-slate-400">کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است. نوار پلاکدار و نوار درزدار با فاصله‌های رایج عرضه می‌شود. لوله پلی‌اتیلن برای خط ثابت کنار این نوارها هست. لوله نخدار برای انشعاب موقت مناسب است. فیلتر، شن و جلبک را پیش از قطره‌چکان می‌گیرد. اتصالات، مسیر و زون را کامل می‌کنند. هر کالا مشخصات فنی و قیمت روز دارد. می‌توانید پیش از خرید مشاوره رایگان بگیرید. انتخاب درست، مصرف آب مزرعه را کمتر می‌کند. یکنواختی رطوبت در طول ردیف بیشتر می‌شود. سفارش به شهرهای ایران ارسال می‌شود.</p>
         </article>
-        <p class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-slate-500">استفاده از مطالب فروشگاه اینترنتی کشت‌دریپ فقط برای مقاصد غیرتجاری و با ذکر منبع بلامانع است. کلیه حقوق این سایت محفوظ می‌باشد.</p>
+        <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-slate-500">استفاده غیرتجاری از مطالب کشت‌دریپ با ذکر منبع مجاز است. کلیه حقوق این سایت محفوظ است.</div>
       </div>
     </section>
   </footer>

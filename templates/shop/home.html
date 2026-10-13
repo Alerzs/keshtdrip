@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load images %}
 {% block content %}
 <h1 class="sr-only">{{ seo.heading }}</h1>
 <section class="flex flex-col gap-y-4 py-4 lg:gap-y-8">
@@ -13,7 +14,8 @@
   <div class="mx-auto grid w-full max-w-[1440px] grid-cols-6 gap-2 overflow-hidden px-4 md:gap-4 xl:px-20">
     {% for cat in categories|slice:":5" %}
       <a href="{{ cat.get_absolute_url }}" class="{% cycle 'col-span-3' 'col-span-3' 'col-span-2' 'col-span-2' 'col-span-2' %} group block overflow-hidden rounded-xl transition duration-300 ease-out hover:opacity-90">
-        {% include "shop/_media.html" with src=cat.image alt=cat.name label=cat.name size="category" %}
+        {% image_alt "تصویر دسته" cat.name "" forloop.counter as cat_alt %}
+        {% include "shop/_media.html" with src=cat.image alt=cat_alt label=cat.name size="category" %}
       </a>
     {% endfor %}
   </div>
@@ -32,18 +34,18 @@
   </section>
   <section class="mx-auto grid w-full max-w-[1440px] gap-4 px-4 md:grid-cols-3 xl:px-20">
     <article class="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 class="mb-2 text-lg font-bold">خرید نوار تیپ</h2>
-      <p class="mb-4 text-sm leading-7 text-slate-600">نوار تیپ پلاکدار و درزدار برای آبیاری ردیفی، در فاصله و ضخامت‌های رایج. رول را با طول خط و فاصله بوته انتخاب کنید. فاصله ۱۰، ۲۰ یا ۳۰ سانتی‌متر را با تراکم کشت یکی کنید تا آب مستقیم پای بوته برسد و مصرف آب کمتر شود.</p>
+      <div class="mb-2 text-lg font-bold">خرید نوار تیپ</div>
+      <p class="mb-4 text-sm leading-7 text-slate-600">نوار تیپ پلاکدار برای ردیف بلند یکنواخت‌تر آب می‌دهد. نوار درزدار برای یک فصل کوتاه ارزان‌تر است. فاصله خروجی را با فاصله بوته یکی کنید. فاصله ده سانتی برای کشت متراکم مناسب است. فاصله بیست سانتی برای بیشتر سبزی‌ها کافی است. فاصله سی سانتی برای بوته پراکنده بهتر است. ضخامت دیواره را با زبری زمین بسنجید. زمین سنگی به دیواره ضخیم‌تر نیاز دارد. رول را بلندتر از حد یکنواختی نوار نگیرید. اگر ردیف زمین بلند است، آب را از وسط خط بدهید. پیش از خرید، فشار سر نوار را بدانید. کشت‌دریپ این عددها را کنار هر رول نوشته است.</p>
       <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'catalog' %}?category=drip-tape">مشاهده نوار تیپ</a>
     </article>
     <article class="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 class="mb-2 text-lg font-bold">خرید لوازم آبیاری</h2>
-      <p class="mb-4 text-sm leading-7 text-slate-600">لوله پلی‌اتیلن، لوله نخدار، فیلتر و اتصالات کنار نوار تیپ، قطعات یک سامانه قطره‌ای را کامل می‌کنند. سایز لوله را با دبی و طول مسیر انتخاب کنید تا انتهای مزرعه هم فشار کافی داشته باشد.</p>
+      <div class="mb-2 text-lg font-bold">خرید لوازم آبیاری</div>
+      <p class="mb-4 text-sm leading-7 text-slate-600">لوله پلی‌اتیلن برای مسیر ثابت کنار نوار تیپ لازم است. لوله نخدار برای انشعاب موقت و جابه‌جایی فصلی به‌کار می‌آید. فیلتر، شن و ذرات آب را پیش از ورود به نوار می‌گیرد. اتصالات، نوار را به لوله وصل می‌کنند. سایز لوله را با جمع دبی همان قطعه حساب کنید. مسیر طولانی به قطر بیشتر نیاز دارد. اگر لوله باریک باشد، انتهای مزرعه کم‌آب می‌ماند. فشار کار لوله را با پمپ همان زون بخوانید. شیر قطع را برای هر قطعه جدا بگذارید. این قطعه‌ها یک سامانه قطره‌ای را کامل می‌کنند.</p>
       <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'catalog' %}">ورود به فروشگاه</a>
     </article>
     <article class="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 class="mb-2 text-lg font-bold">راهنمای انتخاب نوار تیپ</h2>
-      <p class="mb-4 text-sm leading-7 text-slate-600">فاصله قطره‌چکان، ضخامت دیواره و تفاوت پلاکدار با درزدار را قبل از خرید نوار تیپ بررسی کنید. ضخامت بیشتر برای زمین‌های زبر و فصل طولانی‌تر مناسب است؛ پلاکدار هم دبی یکنواخت‌تری در طول خط می‌دهد.</p>
+      <div class="mb-2 text-lg font-bold">راهنمای انتخاب نوار تیپ</div>
+      <p class="mb-4 text-sm leading-7 text-slate-600">فاصله قطره‌چکان را پیش از خرید نوار تیپ مشخص کنید. این فاصله باید آب را به ریشه برساند. ضخامت دیواره، دوام نوار را در برابر کشش تعیین می‌کند. نوار نازک برای یک فصل و زمین تمیز کافی است. نوار ضخیم‌تر برای زمین زبر بهتر است. اگر نوار را دوباره پهن می‌کنید، ضخامت بالاتر منطقی است. پلاکدار دبی پایدارتری در طول خط می‌دهد. درزدار ارزان‌تر است و آب تمیزتری می‌خواهد. اگر فیلتر ضعیف باشد، درزدار زودتر می‌گیرد. فشار مجاز نوار را با رگولاتور هماهنگ کنید. طول ردیف را از حد کاتالوگ بالاتر نبرید.</p>
       <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'how-to-choose-drip-tape' %}">مطالعه راهنما</a>
     </article>
   </section>

@@ -13,6 +13,19 @@ from .models import Brand, Category, Product, ProductVariant
 from .seo import PRIVATE_DESCRIPTION, absolute_url, attach, blog_seo, catalog_seo, pack, product_seo
 
 
+def _dedupe_alts(items):
+    totals = {}
+    for item in items:
+        totals[item["alt"]] = totals.get(item["alt"], 0) + 1
+    seen = {}
+    for item in items:
+        base = item["alt"]
+        if totals[base] < 2:
+            continue
+        seen[base] = seen.get(base, 0) + 1
+        item["alt"] = f"{base} — نمای {seen[base]}"
+
+
 def _product_gallery(product):
     items = []
     seen = set()
@@ -21,7 +34,8 @@ def _product_gallery(product):
         url = image_src(url)
         if url and url not in seen:
             seen.add(url)
-            items.append({"url": url, "alt": alt})
+            text = " ".join(str(alt or "").split()) or product.name or "تصویر محصول"
+            items.append({"url": url, "alt": text})
 
     if product.image:
         add(product.image, product.name)
@@ -31,6 +45,7 @@ def _product_gallery(product):
     if len(items) < 2:
         for url in sibling_image_urls(product.image):
             add(url, f"{product.name} — نمای {len(items) + 1}")
+    _dedupe_alts(items)
     return items
 
 
@@ -129,6 +144,17 @@ HOME_RAIL_LIMIT = 12
 
 def _home_rail(qs):
     return list(qs[:HOME_RAIL_LIMIT])
+
+
+def home_amp(request):
+    return render(
+        request,
+        "shop/home_amp.html",
+        {
+            "categories": Category.objects.all()[:8],
+            "blog_posts": featured_posts(6),
+        },
+    )
 
 
 def home(request):

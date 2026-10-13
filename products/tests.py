@@ -1,3 +1,5 @@
+import gzip
+import re
 from io import BytesIO
 
 from django.contrib.auth import get_user_model
@@ -5,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from openpyxl import Workbook, load_workbook
 
-from products.models import Brand, Category, Product, ProductAttribute, ProductVariant
+from products.models import Brand, Category, Product, ProductAttribute, ProductImage, ProductVariant
 from products.price_import import PriceImportError, import_price_workbook
 
 
@@ -164,6 +166,91 @@ class SeoTests(TestCase):
         self.assertIn('loading="lazy"', html)
         self.assertIn('fetchpriority="high"', html)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'rel="apple-touch-icon"')
+        self.assertContains(response, 'hreflang="fa-IR"')
+        self.assertContains(response, 'hreflang="x-default"')
+        self.assertContains(response, 'rel="amphtml"')
+        self.assertLessEqual(len(re.findall(r"<h[1-6]\b", html)), 12)
+        self.assertNotIn('alt=""', html)
+
+    def test_public_pages_follow_persian_prose_rules(self):
+        forbidden = re.compile(r"ن?می[\u200c\s]*باشد")
+        paths = (
+            reverse("home"),
+            reverse("about"),
+            reverse("blog"),
+            reverse("home_amp"),
+            reverse("blog_detail", args=["how-to-choose-drip-tape"]),
+        )
+        for path in paths:
+            html = self.client.get(path).content.decode()
+            self.assertIsNone(forbidden.search(html), path)
+            for raw in re.findall(r"<p\b[^>]*>(.*?)</p>", html, flags=re.S):
+                text = re.sub(r"<[^>]+>", " ", raw)
+                text = re.sub(r"\s+", " ", text).strip()
+                count = len(re.findall(r"\S+", text))
+                self.assertGreaterEqual(count, 60, text)
+                self.assertLessEqual(count, 100, text)
+                for sentence in re.findall(r"[^.!?؟]+[.!?؟]?", text):
+                    sentence = sentence.strip()
+                    if not sentence:
+                        continue
+                    self.assertLessEqual(len(re.findall(r"\S+", sentence)), 20, sentence)
+
+    def test_home_alt_texts_stay_unique_when_products_repeat(self):
+        tape = Category.objects.create(name="نوار تیپ", slug="drip-tape", tagline="نوار")
+        brand = Brand.objects.create(name="کشت‌دریپ", slug="alt-brand")
+        Product.objects.create(
+            category=tape,
+            brand=brand,
+            name="نوار تیپ تکراری",
+            slug="alt-tape",
+            blurb="نوار",
+            description="توضیح",
+            price=1000,
+            unit="رول",
+            image="img/alt-tape.webp",
+        )
+        response = self.client.get(reverse("home"))
+        html = response.content.decode()
+        alts = re.findall(r'<img\b[^>]*\balt="([^"]*)"', html)
+        self.assertGreaterEqual(len(alts), 2)
+        self.assertTrue(all(alt.strip() for alt in alts))
+        self.assertEqual(len(alts), len(set(alts)))
+        self.assertLessEqual(len(re.findall(r"<h[1-6]\b", html)), 12)
+
+    def test_amp_homepage_and_gzip(self):
+        amp = self.client.get(reverse("home_amp"))
+        self.assertContains(amp, "<html amp")
+        self.assertContains(amp, "https://cdn.ampproject.org/v0.js")
+        self.assertContains(amp, 'rel="canonical"')
+        self.assertNotContains(amp, 'rel="amphtml"')
+        page = self.client.get(reverse("home"), HTTP_ACCEPT_ENCODING="gzip")
+        self.assertEqual(page.headers["Content-Encoding"], "gzip")
+        self.assertIn("خرید نوار تیپ", gzip.decompress(page.content).decode())
+
+    def test_gallery_alts_are_unique(self):
+        category = Category.objects.create(name="نوار", slug="gallery-cat", tagline="نوار")
+        brand = Brand.objects.create(name="برند", slug="gallery-brand")
+        product = Product.objects.create(
+            category=category,
+            brand=brand,
+            name="نوار گالری",
+            slug="gallery-tape",
+            blurb="نوار",
+            description="توضیح",
+            price=1000,
+            unit="رول",
+            image="img/gallery-main.webp",
+        )
+        ProductImage.objects.create(product=product, image="img/gallery-2.webp", alt="نوار گالری")
+        ProductImage.objects.create(product=product, image="img/gallery-3.webp", alt="نوار گالری")
+        from products.views import _product_gallery
+
+        gallery = _product_gallery(product)
+        alts = [item["alt"] for item in gallery]
+        self.assertGreaterEqual(len(alts), 3)
+        self.assertEqual(len(alts), len(set(alts)))
 
     def test_drip_tape_catalog_title_and_heading(self):
         Category.objects.create(name="نوار تیپ", slug="drip-tape", tagline="نوار تیپ آبیاری")

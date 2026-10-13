@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static prose %}
 {% block content %}
 <section class="mx-auto max-w-[1440px] px-4 py-8 xl:px-20">
   <nav class="mb-5 text-sm text-slate-400" aria-label="مسیر">
@@ -7,13 +7,13 @@
     <span class="mx-1">/</span>
     <span class="text-slate-600">وبلاگ</span>
   </nav>
-  <p class="mb-2 text-sm font-medium text-cyanbtn">آموزش و راهنما</p>
+  <div class="mb-2 text-sm font-medium text-cyanbtn">آموزش و راهنما</div>
   <h1 class="mb-3 text-2xl font-bold leading-10 md:text-3xl">راهنمای آبیاری قطره‌ای و نوار تیپ</h1>
   <div class="mb-6 max-w-3xl space-y-4 leading-8 text-slate-600">
-    <p>اینجا روش انتخاب نوار تیپ، تنظیم فشار و طول ردیف، فیلتراسیون، سایز لوله، بستن اتصالات و کودآبیاری را با زبان مزرعه نوشته‌ایم. هر راهنما به قطعه‌ای وصل است که در فروشگاه کشت‌دریپ با مشخصات فنی و قیمت روز می‌توانید ببینید.</p>
-    <p>اگر سامانه را از صفر می‌چینید، از <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-irrigation-advantages-and-components' %}">معرفی قطعات آبیاری قطره‌ای</a> شروع کنید. برای خرید نوار، <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'how-to-choose-drip-tape' %}">فاصله قطره‌چکان و ضخامت</a> را با <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-tape-pressure-and-row-length' %}">فشار کار و طول ردیف</a> با هم بسنجید. آب چاه یا استخر هم بدون <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-filter-mesh-vs-disc' %}">فیلتر مناسب</a> قطره‌چکان را زود می‌بندد.</p>
+    <p>اینجا انتخاب نوار تیپ را با زبان مزرعه نوشته‌ایم. تنظیم فشار و طول ردیف هم در راهنماها هست. فیلتراسیون را پیش از خرید قطره‌چکان بخوانید. سایز لوله را با دبی همان زون بسنجید. بستن اتصالات را جدا توضیح داده‌ایم. کودآبیاری و شست‌وشوی خط هم آمده است. هر راهنما به یک قطعه در فروشگاه وصل است. مشخصات فنی کنار قیمت روز دیده می‌شود. اگر بین دو سایز مردد هستید، اول راهنما را بخوانید. بعد همان کالا را در کشت‌دریپ مقایسه کنید.</p>
+    <p>اگر سامانه را از صفر می‌چینید، از <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-irrigation-advantages-and-components' %}">معرفی قطعات</a> شروع کنید. آن مطلب مسیر آب را از پمپ تا قطره‌چکان نشان می‌دهد. برای خرید نوار، <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'how-to-choose-drip-tape' %}">فاصله قطره‌چکان</a> را اول بخوانید. ضخامت دیواره را با جنس زمین بسنجید. <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-tape-pressure-and-row-length' %}">فشار کار</a> را با طول ردیف کنار هم بگذارید. ردیف بلند را از وسط تغذیه کنید. آب چاه بدون فیلتر، پلاک را زود می‌بندد. نوع <a class="font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' 'drip-filter-mesh-vs-disc' %}">فیلتر</a> را با کیفیت آب یکی کنید. بعد از این راهنماها، خرید دقیق‌تر می‌شود. هر قطعه را با مشخصات همان زون سفارش دهید.</p>
   </div>
-  <p class="mb-8 text-sm text-slate-400">{{ post_count }} راهنما · مزرعه، باغ و گلخانه</p>
+  <div class="mb-8 text-sm text-slate-400">{{ post_count }} راهنما · مزرعه، باغ و گلخانه</div>
 
   <nav class="mb-10 flex flex-wrap gap-2" aria-label="موضوع‌های راهنما">
     {% for group in groups %}
@@ -24,7 +24,7 @@
   {% for group in groups %}
     <section id="{{ group.slug }}" class="mb-12 scroll-mt-28">
       <h2 class="mb-2 text-xl font-bold">{{ group.name }}</h2>
-      <p class="mb-5 max-w-3xl leading-8 text-slate-600">{{ group.intro }}</p>
+      {% prose group.intro "mb-5 max-w-3xl leading-8 text-slate-600" %}
       <div class="grid gap-4 md:grid-cols-2">
         {% for post in group.posts %}
           <article class="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.04)] transition hover:border-cyanbtn">
@@ -34,12 +34,12 @@
               </a>
             {% endif %}
             <div class="flex flex-1 flex-col p-5">
-              <p class="mb-2 text-xs text-slate-400">
+              <div class="mb-2 text-xs text-slate-400">
                 <time datetime="{{ post.published }}">{{ post.date }}</time>
                 · {{ post.read_minutes }} دقیقه مطالعه
-              </p>
+              </div>
               <h3 class="mb-2 text-lg font-bold"><a class="hover:text-cyanbtn" href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></h3>
-              <p class="mb-4 grow leading-7 text-slate-500">{{ post.excerpt }}</p>
+              {% prose post.excerpt "mb-4 grow leading-7 text-slate-500" %}
               <a class="text-sm font-semibold text-cyanbtn hover:text-cyanbtnHover" href="{% url 'blog_detail' post.slug %}">ادامه مطلب</a>
             </div>
           </article>
@@ -50,7 +50,7 @@
 
   <div class="max-w-3xl rounded-2xl border border-cyanbtn/20 bg-header p-6">
     <h2 class="mb-2 text-lg font-bold">قطعه را بعد از خواندن راهنما انتخاب کنید</h2>
-    <p class="mb-4 leading-8 text-slate-600">نوار تیپ، لوله، فیلتر و اتصالات کشت‌دریپ با مشخصات فنی کنار هم هستند. اگر بین دو سایز مردد هستید، قبل از سفارش مشاوره بگیرید تا فشار و دبی زون با قطعه یکی باشد.</p>
+    <p class="mb-4 leading-8 text-slate-600">نوار تیپ کشت‌دریپ با مشخصات فنی کنار قیمت روز است. لوله پلی‌اتیلن و لوله نخدار هم در همان فروشگاه هستند. فیلتر را با نوع آب چاه یا استخر انتخاب کنید. اتصالات، نوار را به خط اصلی وصل می‌کنند. اگر بین دو سایز مردد هستید، اول دبی زون را جمع کنید. فشار سر خط را هم اندازه بگیرید. بعد همان عددها را با برگه کالا مقایسه کنید. مشاوره رایگان پیش از سفارش این مقایسه را کوتاه می‌کند. قطعه نامناسب، ته ردیف را کم‌آب می‌گذارد. انتخاب هماهنگ، رطوبت را در طول خط یکدست می‌کند.</p>
     <a class="inline-flex rounded-xl bg-cyanbtn px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyanbtnHover" href="{% url 'catalog' %}">ورود به فروشگاه</a>
   </div>
 </section>

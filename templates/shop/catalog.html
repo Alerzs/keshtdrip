@@ -13,7 +13,7 @@
     {% endif %}
   </nav>
   <h1 class="mb-2 text-2xl font-bold">{{ seo.heading }}</h1>
-  <p class="mb-6 text-slate-500">{% if seo.intro %}{{ seo.intro }}{% elif active_category %}{{ active_category.tagline }}{% else %}گروه محصول را انتخاب کنید یا نام کالا را جستجو کنید.{% endif %}</p>
+  <div class="mb-6 text-slate-500">{% if seo.intro %}{{ seo.intro }}{% elif active_category %}{{ active_category.tagline }}{% else %}گروه محصول را انتخاب کنید یا نام کالا را جستجو کنید.{% endif %}</div>
   <form class="mb-6 flex max-w-xl gap-2" action="{% url 'catalog' %}" method="get">
     {% if active_category %}
       <input type="hidden" name="category" value="{{ active_category.slug }}">
@@ -43,7 +43,7 @@
       {% include "shop/_card_list.html" with products=products layout="grid" %}
     </div>
   {% else %}
-    <p class="text-slate-500">محصولی در این گروه یافت نشد.</p>
+    <div class="text-slate-500">محصولی در این گروه یافت نشد.</div>
   {% endif %}
 </section>
 {% endblock %}

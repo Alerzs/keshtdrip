@@ -14,14 +14,14 @@
   <div class="order-1 lg:order-2 lg:col-start-2 lg:hidden">
     <h1 class="text-xl font-bold leading-8">{{ product.name }}</h1>
     {% if product.blurb %}
-      <p class="mt-1 text-sm text-slate-500">{{ product.blurb }}</p>
+      <div class="mt-1 text-sm text-slate-500">{{ product.blurb }}</div>
     {% endif %}
   </div>
 
   <div class="order-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-[0_12px_40px_rgba(15,23,42,0.06)] md:p-4 lg:order-1 lg:top-28">
     <figure id="kd-zoom" class="relative mx-auto m-0 w-fit max-w-full overflow-hidden rounded-xl bg-gradient-to-b from-slate-50 to-white">
       {% if gallery %}
-        <img id="kd-main-image" src="{{ gallery.0.url }}" alt="{{ gallery.0.alt }}" fetchpriority="high" decoding="async" class="block h-auto max-h-[280px] w-auto max-w-full cursor-zoom-in object-contain sm:max-h-[320px] md:max-h-[340px]">
+        <img id="kd-main-image" src="{{ gallery.0.url }}" alt="{{ gallery.0.alt }}، نمای بزرگ" fetchpriority="high" decoding="async" class="block h-auto max-h-[280px] w-auto max-w-full cursor-zoom-in object-contain sm:max-h-[320px] md:max-h-[340px]">
       {% else %}
         <span class="grid min-h-[240px] place-items-center px-3 text-center text-sm text-slate-500">محل تصویر محصول</span>
       {% endif %}
@@ -29,8 +29,8 @@
     {% if gallery|length > 1 %}
       <div class="mt-3 flex gap-2 overflow-x-auto pb-1" role="list" aria-label="تصاویر محصول">
         {% for item in gallery %}
-          <button type="button" role="listitem" data-kd-thumb data-src="{{ item.url }}" data-alt="{{ item.alt }}" class="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl border-2 bg-slate-50 transition hover:border-cyanbtn {% if forloop.first %}border-cyanbtn ring-2 ring-cyanbtn/20{% else %}border-slate-200{% endif %}">
-            <img src="{{ item.url }}" alt="{{ item.alt }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
+          <button type="button" role="listitem" data-kd-thumb data-src="{{ item.url }}" data-alt="{{ item.alt }}، بندانگشتی {{ forloop.counter }}" class="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl border-2 bg-slate-50 transition hover:border-cyanbtn {% if forloop.first %}border-cyanbtn ring-2 ring-cyanbtn/20{% else %}border-slate-200{% endif %}">
+            <img src="{{ item.url }}" alt="{{ item.alt }}، بندانگشتی {{ forloop.counter }}" loading="lazy" decoding="async" class="absolute inset-0 h-full w-full object-cover">
           </button>
         {% endfor %}
       </div>
@@ -41,16 +41,16 @@
     <div class="hidden lg:block">
       <h1 class="text-2xl font-bold leading-9 md:text-[28px]">{{ product.name }}</h1>
       {% if product.blurb %}
-        <p class="mt-1 text-sm text-slate-500">{{ product.blurb }}</p>
+        <div class="mt-1 text-sm text-slate-500">{{ product.blurb }}</div>
       {% endif %}
     </div>
 
     <div class="mt-4 text-sm text-slate-600">
-      <p>کد کالا : <span id="kd-sku" class="inline-block font-semibold text-slate-800" dir="ltr">{% if selected_variant %}{{ selected_variant.slug }}{% else %}{{ product.slug }}{% endif %}</span></p>
+      <div>کد کالا : <span id="kd-sku" class="inline-block font-semibold text-slate-800" dir="ltr">{% if selected_variant %}{{ selected_variant.slug }}{% else %}{{ product.slug }}{% endif %}</span></div>
       <div class="mt-3 space-y-2">
-        <p>دسته : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></p>
-        <p>برند : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></p>
-        <p>مشاهده انواع <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}{% if product.brand %}&brand={{ product.brand.slug }}{% endif %}">{{ product.category.name }}{% if product.brand %} {{ product.brand.name }}{% endif %}</a></p>
+        <div>دسته : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></div>
+        <div>برند : <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
+        <div>مشاهده انواع <a class="font-medium text-cyanbtn transition hover:text-cyanbtnHover" href="{{ product.category.get_absolute_url }}{% if product.brand %}&brand={{ product.brand.slug }}{% endif %}">{{ product.category.name }}{% if product.brand %} {{ product.brand.name }}{% endif %}</a></div>
       </div>
     </div>
 
@@ -104,15 +104,15 @@
       </div>
       {{ variant_payload|json_script:"kd-variants" }}
     {% endif %}
-    <p class="text-2xl font-bold text-slate-900"><span id="kd-price">{{ display_price|fa_num }}</span> <span class="text-base font-semibold text-slate-500">تومان</span></p>
+    <div class="text-2xl font-bold text-slate-900"><span id="kd-price">{{ display_price|fa_num }}</span> <span class="text-base font-semibold text-slate-500">تومان</span></div>
     {% if variants %}
-      <p id="kd-variant-note" class="mt-1 text-sm text-slate-500">{{ selected_variant.spec_label|fa_num }}</p>
+      <div id="kd-variant-note" class="mt-1 text-sm text-slate-500">{{ selected_variant.spec_label|fa_num }}</div>
     {% endif %}
-    <p class="mt-1 text-sm text-slate-500">واحد فروش: {{ product.unit }}</p>
+    <div class="mt-1 text-sm text-slate-500">واحد فروش: {{ product.unit }}</div>
     {% if product.stock <= 5 %}
-      <p class="mt-4 text-sm font-semibold text-rose-600">تنها {{ product.stock|fa_num }} عدد در انبار باقی مانده</p>
+      <div class="mt-4 text-sm font-semibold text-rose-600">تنها {{ product.stock|fa_num }} عدد در انبار باقی مانده</div>
     {% else %}
-      <p class="mt-4 text-sm text-slate-500">موجود در انبار</p>
+      <div class="mt-4 text-sm text-slate-500">موجود در انبار</div>
     {% endif %}
     <div class="mt-4 flex flex-col gap-3">
       <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">

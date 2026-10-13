@@ -1,0 +1,7 @@
+{% for block in blocks %}
+  {% if block.is_paragraph %}
+    <p class="{{ class_name }}">{{ block.text }}</p>
+  {% else %}
+    <div class="{{ class_name }}">{{ block.text }}</div>
+  {% endif %}
+{% endfor %}
