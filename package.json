@@ -2,7 +2,8 @@
   "name": "keshtdrip",
   "private": true,
   "scripts": {
-    "build:css": "npx @tailwindcss/cli -i ./tailwind/input.css -o ./static/css/output.css --minify",
+    "build:css": "npx @tailwindcss/cli -i ./tailwind/input.css -o ./static/css/output.css --minify && npm run build:amp-css",
+    "build:amp-css": "npx @tailwindcss/cli -i ./tailwind/amp.css -o ./static/css/home_amp.css --minify && node ./tailwind/flatten-amp.js",
     "watch:css": "npx @tailwindcss/cli -i ./tailwind/input.css -o ./static/css/output.css --watch"
   },
   "devDependencies": {

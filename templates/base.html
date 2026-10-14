@@ -48,19 +48,19 @@
 <body class="min-h-screen overflow-x-clip bg-[#f7fff8] font-sans text-[#202021] antialiased">
   <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-header/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-md">
     <section class="z-50 py-3">
-      <div class="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 md:flex-row md:items-center md:gap-x-4 xl:px-20">
-        <div class="flex items-center justify-between gap-3 md:contents">
-          <div class="flex min-w-0 items-center gap-3 md:gap-5">
-            <div class="md:hidden">
+      <div class="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 lg:flex-row lg:items-center lg:gap-x-4 xl:px-20">
+        <div class="flex items-center justify-between gap-3 lg:contents">
+          <div class="flex min-w-0 items-center gap-3 lg:gap-5">
+            <div class="lg:hidden">
               <button type="button" id="kd-menu-btn" aria-label="باز کردن منو" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-slate-700 transition hover:bg-white hover:text-cyanbtn">
                 <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
               </button>
             </div>
             <a href="{% url 'home' %}" class="shrink-0 leading-none">
-              <img width="96" height="64" class="h-12 w-auto object-contain md:h-16" alt="کشت‌دریپ، خرید نوار تیپ و لوازم آبیاری" decoding="async" src="{% static 'img/keshtdrip.webp' %}">
+              <img width="96" height="64" class="h-12 w-auto object-contain lg:h-16" alt="کشت‌دریپ، خرید نوار تیپ و لوازم آبیاری" decoding="async" src="{% static 'img/keshtdrip.webp' %}">
             </a>
           </div>
-          <div class="flex shrink-0 flex-row items-center gap-2 py-1 sm:gap-3 md:order-3">
+          <div class="flex shrink-0 flex-row items-center gap-2 py-1 sm:gap-3 lg:order-3 lg:ms-auto">
           {% if user.is_authenticated %}
             <a href="{% url 'account' %}" class="inline-flex h-[42px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-800 shadow-sm transition hover:border-cyanbtn hover:text-cyanbtn sm:px-3.5">
               <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 19c1.5-3 4-4.5 7-4.5s5.5 1.5 7 4.5"/></svg>
@@ -80,14 +80,14 @@
           </a>
           </div>
         </div>
-        <form action="{% url 'catalog' %}" method="get" class="relative w-full min-w-0 rounded-xl border border-slate-200 bg-white shadow-sm transition focus-within:border-cyanbtn focus-within:shadow-[0_0_0_3px_rgba(102,187,106,0.12)] md:order-2 md:max-w-[640px] md:flex-1">
+        <form action="{% url 'catalog' %}" method="get" class="relative w-full min-w-0 rounded-xl border border-slate-200 bg-white shadow-sm transition focus-within:border-cyanbtn focus-within:shadow-[0_0_0_3px_rgba(102,187,106,0.12)] lg:order-2 lg:max-w-[640px] lg:flex-1">
           <svg class="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
           <input class="h-[44px] w-full min-w-0 bg-transparent py-2 pl-3 pr-12 text-sm text-slate-800 outline-none placeholder:text-slate-400" name="q" placeholder="جستجو؛ نوار تیپ، لوله، اتصالات" value="{{ query|default:'' }}">
         </form>
       </div>
     </section>
-    <section id="kd-navbar" class="hidden border-t border-slate-200/70 bg-white/40 text-sm md:block">
-      <nav class="mx-auto flex max-w-[1440px] flex-row flex-wrap items-stretch justify-start gap-x-1 whitespace-nowrap px-4 xl:px-20">
+    <section id="kd-navbar" class="hidden border-t border-slate-200/70 bg-white/40 text-sm lg:block">
+      <nav class="mx-auto flex max-w-[1440px] flex-row flex-nowrap items-stretch justify-start gap-x-0.5 overflow-x-auto whitespace-nowrap px-4 [scrollbar-width:none] xl:gap-x-1 xl:px-20 [&::-webkit-scrollbar]:hidden">
         <a href="{% url 'catalog' %}" class="group relative flex flex-row items-center gap-2 px-3 py-3 font-semibold text-slate-800 transition hover:text-cyanbtn">
           <svg class="size-5 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           دسته‌بندی محصولات
@@ -101,7 +101,7 @@
         <a href="{% url 'about' %}" class="group relative px-3 py-3 font-medium text-slate-600 transition hover:text-cyanbtn">درباره ما<span class="absolute inset-x-3 bottom-0 h-0.5 origin-center scale-x-0 rounded-full bg-cyanbtn transition group-hover:scale-x-100"></span></a>
       </nav>
     </section>
-    <nav id="kd-mobile-nav" class="hidden flex-col gap-1 border-t border-slate-200 bg-white px-4 py-3 text-sm md:hidden">
+    <nav id="kd-mobile-nav" class="hidden flex-col gap-1 border-t border-slate-200 bg-white px-4 py-3 text-sm lg:hidden">
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'home' %}">خانه</a>
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'catalog' %}?category=drip-tape">نوار تیپ</a>
       <a class="rounded-lg px-2 py-2.5 font-medium text-slate-700 hover:bg-header hover:text-cyanbtn" href="{% url 'catalog' %}">خرید لوازم آبیاری</a>
@@ -137,20 +137,20 @@
     <section class="border-y border-white/10">
       <div class="mx-auto grid max-w-[1440px] grid-cols-2 gap-3 px-4 py-8 sm:grid-cols-4 xl:px-20">
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
-          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h11v10H3zM14 11h4l3 3v3h-7"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>
-          <div class="text-sm font-medium text-white">ارسال ویژه</div>
+          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21V11"/><path d="M12 14c-4.5 0-7-2.5-7-7 4.5 0 7 2.5 7 7Z"/><path d="M12 11c0-4 2.5-6 6.5-6 0 4-2.5 6-6.5 6Z"/><path d="m15.5 17 2 2 4-4"/></svg>
+          <div class="text-sm font-medium text-white">گارانتی کشت</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
-          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.9v-3a2 2 0 0 0-2-2h-1"/><path d="M2 16.9V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8.9"/><path d="M6 19a2 2 0 0 0 4 0M14 19a2 2 0 0 0 4 0"/></svg>
-          <div class="text-sm font-medium text-white">پشتیبانی ۲۴ ساعته</div>
+          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3 20 6v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+          <div class="text-sm font-medium text-white">گارانتی اصالت</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
-          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h13v10H3z"/><path d="m9 10 2 2 4-4"/></svg>
-          <div class="text-sm font-medium text-white">۷ روز ضمانت بازگشت</div>
+          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 9h18"/><path d="M5 9v10h14V9"/><path d="M4 9 6 4h12l2 5"/><path d="M8 19v-5h8v5"/><path d="M9 4v5M15 4v5"/></svg>
+          <div class="text-sm font-medium text-white">خرید بدون واسطه</div>
         </div>
         <div class="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-5 text-center">
-          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7z"/></svg>
-          <div class="text-sm font-medium text-white">ضمانت اصالت کالا</div>
+          <svg class="size-10 text-cyanbtn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/><circle cx="17" cy="15" r="2"/></svg>
+          <div class="text-sm font-medium text-white">فروش نقدی و اقساطی</div>
         </div>
       </div>
     </section>
@@ -189,114 +189,7 @@
       </div>
     </section>
   </footer>
-  <script>
-    document.getElementById("kd-menu-btn")?.addEventListener("click", function () {
-      document.getElementById("kd-mobile-nav")?.classList.toggle("hidden");
-    });
-    (function () {
-      document.querySelectorAll(".kd-rail").forEach(function (rail) {
-        var track = rail.querySelector(".kd-rail-track");
-        var prev = rail.querySelector(".kd-rail-prev");
-        var next = rail.querySelector(".kd-rail-next");
-        var more = rail.querySelector(".kd-rail-more");
-        if (!track || !prev || !next) return;
-        function maxScroll() {
-          return track.scrollWidth - track.clientWidth;
-        }
-        function moreExtraWidth() {
-          if (!more || more.classList.contains("hidden")) return 0;
-          var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
-          return more.offsetWidth + gap;
-        }
-        function update() {
-          var productsOverflow = maxScroll() - moreExtraWidth() > 4;
-          if (more) more.classList.toggle("hidden", !productsOverflow);
-          var max = maxScroll();
-          var overflow = max > 4;
-          var sl = track.scrollLeft;
-          var atLeft;
-          var atRight;
-          if (getComputedStyle(track).direction === "rtl") {
-            if (sl <= 0) {
-              atRight = sl >= -2;
-              atLeft = sl <= -max + 2;
-            } else {
-              atLeft = sl <= 2;
-              atRight = sl >= max - 2;
-            }
-          } else {
-            atLeft = sl <= 2;
-            atRight = sl >= max - 2;
-          }
-          prev.classList.toggle("invisible", !overflow || atLeft);
-          prev.classList.toggle("pointer-events-none", !overflow || atLeft);
-          next.classList.toggle("invisible", !overflow || atRight);
-          next.classList.toggle("pointer-events-none", !overflow || atRight);
-        }
-        function step() {
-          return Math.max(track.clientWidth * 0.8, 260);
-        }
-        prev.addEventListener("click", function (e) {
-          e.preventDefault();
-          track.scrollBy({ left: -step(), behavior: "smooth" });
-        });
-        next.addEventListener("click", function (e) {
-          e.preventDefault();
-          track.scrollBy({ left: step(), behavior: "smooth" });
-        });
-        track.addEventListener("scroll", update, { passive: true });
-        window.addEventListener("resize", update);
-        if (window.ResizeObserver) new ResizeObserver(update).observe(track);
-        var dragging = false;
-        var dragged = false;
-        var startX = 0;
-        var startScroll = 0;
-        var pointerId = null;
-        function endDrag(e) {
-          if (!dragging) return;
-          if (e && pointerId != null && e.pointerId !== pointerId) return;
-          dragging = false;
-          pointerId = null;
-          track.classList.remove("cursor-grabbing");
-          track.classList.add("cursor-grab");
-        }
-        track.addEventListener("pointerdown", function (e) {
-          if (e.pointerType === "touch") return;
-          if (e.button !== 0) return;
-          pointerId = e.pointerId;
-          dragging = true;
-          dragged = false;
-          startX = e.clientX;
-          startScroll = track.scrollLeft;
-        });
-        window.addEventListener("pointermove", function (e) {
-          if (!dragging || e.pointerId !== pointerId) return;
-          var dx = e.clientX - startX;
-          if (!dragged) {
-            if (Math.abs(dx) < 8) return;
-            dragged = true;
-            track.classList.add("cursor-grabbing");
-            track.classList.remove("cursor-grab");
-            try { track.setPointerCapture(e.pointerId); } catch (err) {}
-          }
-          e.preventDefault();
-          track.scrollLeft = startScroll - dx;
-        }, { passive: false });
-        window.addEventListener("pointerup", endDrag);
-        window.addEventListener("pointercancel", endDrag);
-        track.addEventListener("dragstart", function (e) {
-          e.preventDefault();
-        }, true);
-        track.addEventListener("click", function (e) {
-          if (!dragged) return;
-          e.preventDefault();
-          e.stopPropagation();
-          dragged = false;
-        }, true);
-        update();
-      });
-    })();
-  </script>
+  <script src="{% static 'js/site.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

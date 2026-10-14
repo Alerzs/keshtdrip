@@ -1,4 +1,4 @@
-{% load static %}
+{% load ampcss static %}
 <!doctype html>
 <html amp lang="fa" dir="rtl">
 <head>
@@ -13,51 +13,39 @@
   <link rel="alternate" hreflang="fa-IR" href="{{ seo.canonical }}">
   <link rel="alternate" hreflang="x-default" href="{{ seo.canonical }}">
   <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-  <style amp-custom>
-    body{margin:0;background:#f7fff8;color:#202021;font-family:Tahoma,sans-serif;line-height:1.9}
-    header,main,footer{padding:20px}
-    a{color:#2e7d32;text-decoration:none}
-    h1{font-size:1.6rem;line-height:1.6;margin:0 0 12px}
-    h2{font-size:1.15rem;margin:24px 0 8px}
-    .lead{color:#475569}
-    .box{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-top:12px}
-    ul{margin:0;padding-right:18px}
-    li{margin:6px 0}
-    footer{background:#0b1220;color:#cbd5e1}
-    footer a{color:#86efac}
-  </style>
+  <style amp-custom>{% amp_css "css/home_amp.css" %}</style>
 </head>
-<body>
-  <header>
-    <a href="{{ seo.canonical }}">کشت‌دریپ</a>
+<body class="m-0 bg-[#f7fff8] font-[Tahoma,sans-serif] text-[#202021] leading-[1.9]">
+  <header class="p-5">
+    <a href="{{ seo.canonical }}" class="text-[#2e7d32] no-underline">کشت‌دریپ</a>
   </header>
-  <main>
-    <h1>{{ seo.heading }}</h1>
-    <p class="lead">کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است. نوار پلاکدار و نوار درزدار با فاصله‌های رایج عرضه می‌شود. لوله پلی‌اتیلن برای خط ثابت کنار این نوارها هست. لوله نخدار برای انشعاب موقت مناسب است. فیلتر، شن و جلبک را پیش از قطره‌چکان می‌گیرد. اتصالات، مسیر و زون را کامل می‌کنند. هر کالا مشخصات فنی و قیمت روز دارد. می‌توانید پیش از خرید مشاوره رایگان بگیرید. انتخاب درست، مصرف آب مزرعه را کمتر می‌کند. یکنواختی رطوبت در طول ردیف بیشتر می‌شود. سفارش به شهرهای ایران ارسال می‌شود.</p>
-    <h2>خرید از فروشگاه</h2>
-    <div class="box">
-      <ul>
-        <li><a href="{% url 'catalog' %}">خرید لوازم آبیاری</a></li>
-        <li><a href="{% url 'catalog' %}?category=drip-tape">خرید نوار تیپ</a></li>
-        <li><a href="{% url 'about' %}">درباره کشت‌دریپ</a></li>
+  <main class="p-5">
+    <h1 class="mt-0 mb-3 text-[1.6rem] leading-[1.6]">{{ seo.heading }}</h1>
+    <p class="text-[#475569]">کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است. نوار پلاکدار و نوار درزدار با فاصله‌های رایج عرضه می‌شود. لوله پلی‌اتیلن برای خط ثابت کنار این نوارها هست. لوله نخدار برای انشعاب موقت مناسب است. فیلتر، شن و جلبک را پیش از قطره‌چکان می‌گیرد. اتصالات، مسیر و زون را کامل می‌کنند. هر کالا مشخصات فنی و قیمت روز دارد. می‌توانید پیش از خرید مشاوره رایگان بگیرید. انتخاب درست، مصرف آب مزرعه را کمتر می‌کند. یکنواختی رطوبت در طول ردیف بیشتر می‌شود. سفارش به شهرهای ایران ارسال می‌شود.</p>
+    <h2 class="mt-6 mb-2 text-[1.15rem]">خرید از فروشگاه</h2>
+    <div class="mt-3 rounded-xl border border-solid border-[#e2e8f0] bg-white p-4">
+      <ul class="m-0 list-disc pr-[18px]">
+        <li class="my-1.5"><a href="{% url 'catalog' %}" class="text-[#2e7d32] no-underline">خرید لوازم آبیاری</a></li>
+        <li class="my-1.5"><a href="{% url 'catalog' %}?category=drip-tape" class="text-[#2e7d32] no-underline">خرید نوار تیپ</a></li>
+        <li class="my-1.5"><a href="{% url 'about' %}" class="text-[#2e7d32] no-underline">درباره کشت‌دریپ</a></li>
         {% for cat in categories %}
-          <li><a href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+          <li class="my-1.5"><a href="{{ cat.get_absolute_url }}" class="text-[#2e7d32] no-underline">{{ cat.name }}</a></li>
         {% endfor %}
       </ul>
     </div>
     {% if blog_posts %}
-      <h2>راهنمای آبیاری قطره‌ای</h2>
-      <div class="box">
-        <ul>
+      <h2 class="mt-6 mb-2 text-[1.15rem]">راهنمای آبیاری قطره‌ای</h2>
+      <div class="mt-3 rounded-xl border border-solid border-[#e2e8f0] bg-white p-4">
+        <ul class="m-0 list-disc pr-[18px]">
           {% for post in blog_posts %}
-            <li><a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a></li>
+            <li class="my-1.5"><a href="{% url 'blog_detail' post.slug %}" class="text-[#2e7d32] no-underline">{{ post.title }}</a></li>
           {% endfor %}
         </ul>
       </div>
     {% endif %}
-    <div><a href="{{ seo.canonical }}">مشاهده نسخه کامل سایت</a></div>
+    <div class="mt-3"><a href="{{ seo.canonical }}" class="text-[#2e7d32] no-underline">مشاهده نسخه کامل سایت</a></div>
   </main>
-  <footer>
+  <footer class="bg-[#0b1220] p-5 text-[#cbd5e1] [&_a]:text-[#86efac]">
     <div>کشت‌دریپ مرجع خرید نوار تیپ و لوازم آبیاری قطره‌ای است.</div>
   </footer>
 </body>
