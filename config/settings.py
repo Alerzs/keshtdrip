@@ -1,31 +1,61 @@
 from pathlib import Path
 import os
 import sys
+
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / ".env", override=False)
 
 
-SECRET_KEY = os.environ["django_secret_key"]
+def env_bool(name, default=False):
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "*").replace(";", ",").split(",")
-    if host.strip()
-]
+def env_csv(name, default=""):
+    raw = os.environ.get(name, default).replace(";", ",")
+    return [item.strip() for item in raw.split(",") if item.strip()]
 
+
+SECRET_KEY = (
+    os.environ.get("SECRET_KEY")
+    or os.environ.get("DJANGO_SECRET_KEY")
+    or os.environ.get("django_secret_key")
+    or ""
+).strip().strip("'\"")
+DEBUG = env_bool("DEBUG", default=False)
+
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "SECRET_KEY is missing. Set django_secret_key in .env for local work, "
+        "or SECRET_KEY in the PaaS environment for production."
+    )
+
+ALLOWED_HOSTS = env_csv("ALLOWED_HOSTS", "*")
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip().rstrip("/")
-    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").replace(";", ",").split(",")
-    if origin.strip()
+    origin.rstrip("/")
+    for origin in env_csv("CSRF_TRUSTED_ORIGINS")
+    if origin.startswith(("http://", "https://"))
 ]
+app_url = os.environ.get("APP_URL", "").strip().rstrip("/")
+if app_url.startswith(("http://", "https://")) and app_url not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(app_url)
+for host in ALLOWED_HOSTS:
+    if host in {"*", ""} or host.startswith("."):
+        continue
+    origin = f"https://{host}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+
 SITE_URL = os.environ.get("SITE_URL", "").strip().rstrip("/")
-if SITE_URL and SITE_URL not in CSRF_TRUSTED_ORIGINS:
+if not SITE_URL and app_url:
+    SITE_URL = app_url if app_url.startswith(("http://", "https://")) else f"https://{app_url}"
+if SITE_URL.startswith(("http://", "https://")) and SITE_URL not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(SITE_URL)
 
 if not DEBUG:
@@ -50,6 +80,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'config.middleware.HealthCheckMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -110,6 +141,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 STORAGES = {
     'default': {
