@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import sys
+from urllib.parse import urlparse
 
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
@@ -20,6 +21,16 @@ def env_bool(name, default=False):
 def env_csv(name, default=""):
     raw = os.environ.get(name, default).replace(";", ",")
     return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+def public_origin(value):
+    value = value.strip().rstrip("/")
+    if not value:
+        return "", ""
+    if value.startswith(("http://", "https://")):
+        return value, (urlparse(value).hostname or "")
+    host = value.split("/")[0].split(":")[0]
+    return f"https://{host}", host
 
 
 SECRET_KEY = (
@@ -43,8 +54,12 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.startswith(("http://", "https://"))
 ]
 app_url = os.environ.get("APP_URL", "").strip().rstrip("/")
-if app_url.startswith(("http://", "https://")) and app_url not in CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS.append(app_url)
+if app_url:
+    origin, host = public_origin(app_url)
+    if origin and origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+    if host and host not in ALLOWED_HOSTS and "*" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 for host in ALLOWED_HOSTS:
     if host in {"*", ""} or host.startswith("."):
         continue
@@ -58,11 +73,13 @@ if not SITE_URL and app_url:
 if SITE_URL.startswith(("http://", "https://")) and SITE_URL not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(SITE_URL)
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    USE_X_FORWARDED_HOST = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 180
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
@@ -114,12 +131,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 DB_DIR = BASE_DIR / 'DB'
-DB_DIR.mkdir(exist_ok=True)
+
+
+def sqlite_path():
+    configured = os.environ.get("SQLITE_PATH", "").strip()
+    path = Path(configured) if configured else DB_DIR / "db.sqlite3"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": sqlite_path(),
+        "OPTIONS": {"timeout": 20},
     }
 }
 
@@ -140,7 +165,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+_media_root = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
+if not _media_root.is_absolute():
+    _media_root = BASE_DIR / _media_root
+MEDIA_ROOT = _media_root
 MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 STORAGES = {
@@ -176,5 +204,20 @@ if "test" in sys.argv:
 MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+    },
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }

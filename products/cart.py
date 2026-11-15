@@ -10,23 +10,20 @@ def save_cart(session, cart):
     session.modified = True
 
 
-def line_key(product_id, variant_id=None):
-    if variant_id:
-        return f"{int(product_id)}v{int(variant_id)}"
+def line_key(product_id):
     return str(int(product_id))
 
 
 def parse_line_key(key):
     text = str(key)
     if "v" in text:
-        product_id, variant_id = text.split("v", 1)
-        return int(product_id), int(variant_id)
-    return int(text), None
+        text = text.split("v", 1)[0]
+    return int(text)
 
 
-def add_item(session, product_id, quantity=1, variant_id=None):
+def add_item(session, product_id, quantity=1):
     cart = get_cart(session)
-    key = line_key(product_id, variant_id)
+    key = line_key(product_id)
     cart[key] = cart.get(key, 0) + max(1, int(quantity))
     save_cart(session, cart)
 

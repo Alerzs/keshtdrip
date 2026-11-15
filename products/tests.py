@@ -7,38 +7,33 @@ from django.test import TestCase
 from django.urls import reverse
 from openpyxl import Workbook, load_workbook
 
-from products.models import Brand, Category, Product, ProductAttribute, ProductImage, ProductVariant
+from products.models import Brand, Category, Product, ProductAttribute, ProductImage
 from products.price_import import PriceImportError, import_price_workbook
 
 
-class ProductVariantTests(TestCase):
+def _pipe(category, brand, name, slug, price, pressure, diameter, featured=False):
+    product = Product.objects.create(
+        category=category,
+        brand=brand,
+        name=name,
+        slug=slug,
+        blurb="لوله",
+        description="توضیح",
+        price=price,
+        unit="متر",
+        featured=featured,
+    )
+    ProductAttribute.objects.create(product=product, name="قطر", value=diameter, sort_order=0)
+    ProductAttribute.objects.create(product=product, name="فشار کاری", value=pressure, sort_order=1)
+    return product
+
+
+class ProductCatalogTests(TestCase):
     def setUp(self):
         category = Category.objects.create(name="آبیاری تست", slug="variant-irrigation", tagline="آب")
         brand = Brand.objects.create(name="برند تست", slug="variant-brand")
-        self.product = Product.objects.create(
-            category=category,
-            brand=brand,
-            name="لوله قطره‌ای",
-            slug="drip-pipe",
-            blurb="لوله",
-            description="توضیح",
-            price=1000,
-            unit="متر",
-        )
-        self.low = ProductVariant.objects.create(
-            product=self.product,
-            slug="drip-pipe-16",
-            working_pressure="2 بار",
-            diameter="16 میلی‌متر",
-            price=100000,
-        )
-        self.high = ProductVariant.objects.create(
-            product=self.product,
-            slug="drip-pipe-20",
-            working_pressure="4 بار",
-            diameter="20 میلی‌متر",
-            price=180000,
-        )
+        self.low = _pipe(category, brand, "لوله قطره‌ای ۱۶", "drip-pipe-16", 100000, "2 بار", "16 میلی‌متر")
+        self.high = _pipe(category, brand, "لوله قطره‌ای ۲۰", "drip-pipe-20", 180000, "4 بار", "20 میلی‌متر")
         self.plain = Product.objects.create(
             category=category,
             brand=brand,
@@ -50,67 +45,61 @@ class ProductVariantTests(TestCase):
             unit="جفت",
         )
 
-    def test_catalog_shows_each_pressure_and_diameter_as_its_own_box(self):
+    def test_catalog_shows_each_product_separately(self):
         response = self.client.get(reverse("catalog"))
-        self.assertContains(response, "لوله قطره‌ای", count=3)
+        self.assertContains(response, "لوله قطره‌ای ۱۶")
+        self.assertContains(response, "لوله قطره‌ای ۲۰")
         self.assertContains(response, "۱۰۰٬۰۰۰")
         self.assertContains(response, "۱۸۰٬۰۰۰")
-        self.assertContains(response, "کوزه", count=2)
+        self.assertContains(response, "کوزه")
+        self.assertContains(response, "قطر ۱۶ میلی‌متر")
+        self.assertContains(response, "فشار کاری ۴ بار")
 
-    def test_product_page_prices_the_selected_combination(self):
+    def test_product_page_shows_its_own_price_and_attributes(self):
         response = self.client.get(self.high.get_absolute_url())
         self.assertContains(response, "۱۸۰٬۰۰۰")
-        self.assertContains(response, 'name="working_pressure"')
-        self.assertContains(response, 'name="diameter"')
-        self.assertContains(response, 'name="variant_slug"')
-        self.assertContains(response, 'value="drip-pipe-20"')
-        self.assertContains(response, "4 بار")
-        self.assertContains(response, "20 میلی‌متر")
+        self.assertContains(response, "drip-pipe-20")
+        self.assertContains(response, "۴ بار")
+        self.assertContains(response, "۲۰ میلی‌متر")
+        self.assertNotContains(response, 'name="variant_slug"')
+        self.assertNotContains(response, 'name="working_pressure"')
+        self.assertNotContains(response, "max=")
 
-    def test_cart_uses_the_chosen_combination_price(self):
-        self.client.post(
-            reverse("add_to_cart", args=[self.product.slug]),
-            {"quantity": 2, "variant_slug": "drip-pipe-20"},
-        )
-        self.client.post(
-            reverse("add_to_cart", args=[self.product.slug]),
-            {"quantity": 1, "variant_slug": "drip-pipe-16"},
-        )
+    def test_cart_uses_each_product_price(self):
+        self.client.post(reverse("add_to_cart", args=[self.high.slug]), {"quantity": 2})
+        self.client.post(reverse("add_to_cart", args=[self.low.slug]), {"quantity": 1})
         response = self.client.get(reverse("cart"))
-        self.assertContains(response, "قطر ۲۰ میلی‌متر، فشار کاری ۴ بار")
-        self.assertContains(response, "قطر ۱۶ میلی‌متر، فشار کاری ۲ بار")
+        self.assertContains(response, "قطر ۲۰ میلی‌متر")
+        self.assertContains(response, "فشار کاری ۴ بار")
+        self.assertContains(response, "قطر ۱۶ میلی‌متر")
+        self.assertContains(response, "فشار کاری ۲ بار")
         self.assertContains(response, "drip-pipe-20")
         self.assertContains(response, "drip-pipe-16")
         self.assertContains(response, "۳۶۰٬۰۰۰")
         self.assertContains(response, "۴۶۰٬۰۰۰")
 
-    def test_unknown_combination_is_rejected(self):
-        response = self.client.post(
-            reverse("add_to_cart", args=[self.product.slug]),
-            {"quantity": 1, "variant_slug": "missing-variant"},
-        )
-        self.assertRedirects(response, self.product.get_absolute_url())
-        cart = self.client.get(reverse("cart"))
-        self.assertContains(cart, "سبد خرید")
-        self.assertNotContains(cart, "لوله قطره‌ای")
+    def test_cart_accepts_any_quantity(self):
+        self.client.post(reverse("add_to_cart", args=[self.plain.slug]), {"quantity": 250})
+        response = self.client.get(reverse("cart"))
+        self.assertContains(response, "۲۵۰")
+        self.assertContains(response, "۱۶۰٬۰۰۰٬۰۰۰")
+        self.assertNotContains(response, "max=")
 
-    def test_related_rail_shows_the_featured_variant(self):
-        self.high.featured = True
-        self.high.save()
+    def test_related_rail_lists_other_products(self):
         response = self.client.get(self.plain.get_absolute_url())
         self.assertContains(response, "محصولات مرتبط")
         self.assertContains(response, self.high.get_absolute_url())
+        self.assertContains(response, self.low.get_absolute_url())
         self.assertContains(response, "۱۸۰٬۰۰۰")
-        self.assertNotContains(response, self.low.get_absolute_url())
-        self.assertNotContains(response, "۱۰۰٬۰۰۰")
+        self.assertContains(response, "۱۰۰٬۰۰۰")
 
-    def test_product_attribute_shows_on_the_card_with_specs(self):
-        ProductAttribute.objects.create(product=self.product, name="طول", value="1000 متر")
+    def test_product_attribute_shows_on_the_card(self):
+        ProductAttribute.objects.create(product=self.low, name="طول", value="1000 متر")
         response = self.client.get(reverse("catalog"))
         self.assertContains(response, "طول")
         self.assertContains(response, "۱۰۰۰ متر")
         self.assertContains(response, "قطر")
-        self.assertContains(response, "فشار")
+        self.assertContains(response, "فشار کاری")
 
     def test_product_badge_shows_on_the_rail_card(self):
         self.plain.badge = "پرفروش"
@@ -119,29 +108,16 @@ class ProductVariantTests(TestCase):
         self.assertContains(response, "پرفروش")
         self.assertContains(response, self.plain.get_absolute_url())
 
-    def test_featured_rail_lists_every_featured_variant(self):
+    def test_featured_rail_lists_featured_products(self):
         self.low.featured = True
         self.low.save()
         self.high.featured = True
         self.high.save()
-        self.low.refresh_from_db()
-        self.high.refresh_from_db()
-        self.assertTrue(self.low.featured)
-        self.assertTrue(self.high.featured)
         response = self.client.get(reverse("home"))
         self.assertContains(response, self.low.get_absolute_url())
         self.assertContains(response, self.high.get_absolute_url())
         self.assertContains(response, "۱۰۰٬۰۰۰")
         self.assertContains(response, "۱۸۰٬۰۰۰")
-
-    def test_cart_requires_the_variant_slug(self):
-        response = self.client.post(
-            reverse("add_to_cart", args=[self.product.slug]),
-            {"quantity": 1, "working_pressure": "4 بار", "diameter": "20 میلی‌متر"},
-        )
-        self.assertRedirects(response, self.product.get_absolute_url())
-        cart = self.client.get(reverse("cart"))
-        self.assertNotContains(cart, "لوله قطره‌ای")
 
 
 class SeoTests(TestCase):
@@ -373,12 +349,15 @@ class PriceImportTests(TestCase):
             price=1000,
             unit="متر",
         )
-        self.variant = ProductVariant.objects.create(
-            product=self.product,
+        self.sized = Product.objects.create(
+            category=category,
+            brand=brand,
+            name="لوله قطره‌ای ۴ بار",
             slug="KSH-V-00000044",
-            working_pressure="4 بار",
-            diameter="16",
+            blurb="لوله",
+            description="توضیح",
             price=100000,
+            unit="متر",
         )
         self.plain = Product.objects.create(
             category=category,
@@ -391,24 +370,23 @@ class PriceImportTests(TestCase):
             unit="جفت",
         )
 
-    def test_import_updates_product_and_variant_prices(self):
+    def test_import_updates_each_product_price_by_slug(self):
         upload = price_workbook(
             [
                 ["کد محصول", "نام", "فشار کاری", "قطر", "قیمت"],
                 ["olla", "کوزه", "", "", 700000],
-                ["KSH-P-00000044", "لوله قطره‌ای", "4 بار", 16, "۱٬۲۵۰٬۰۰۰"],
+                ["KSH-V-00000044", "لوله قطره‌ای ۴ بار", "4 بار", 16, "۱٬۲۵۰٬۰۰۰"],
             ]
         )
         result = import_price_workbook(upload)
-        self.assertEqual(result.updated_products, 1)
-        self.assertEqual(result.updated_variants, 1)
+        self.assertEqual(result.updated_products, 2)
         self.assertEqual(result.errors, [])
         self.plain.refresh_from_db()
-        self.variant.refresh_from_db()
+        self.sized.refresh_from_db()
         self.assertEqual(self.plain.price, 700000)
-        self.assertEqual(self.variant.price, 1250000)
+        self.assertEqual(self.sized.price, 1250000)
 
-    def test_unknown_code_and_missing_variant_are_reported(self):
+    def test_unknown_code_is_reported(self):
         upload = price_workbook(
             [
                 ["slug", "price", "working_pressure", "diameter"],
@@ -419,13 +397,16 @@ class PriceImportTests(TestCase):
         )
         result = import_price_workbook(upload)
         self.assertEqual(result.unchanged, 1)
-        self.assertEqual(len(result.errors), 2)
+        self.assertEqual(result.updated_products, 1)
+        self.assertEqual(len(result.errors), 1)
         self.plain.refresh_from_db()
-        self.variant.refresh_from_db()
+        self.product.refresh_from_db()
+        self.sized.refresh_from_db()
         self.assertEqual(self.plain.price, 640000)
-        self.assertEqual(self.variant.price, 100000)
+        self.assertEqual(self.product.price, 20)
+        self.assertEqual(self.sized.price, 100000)
 
-    def test_import_updates_a_variant_by_its_slug(self):
+    def test_import_updates_a_product_by_its_slug(self):
         upload = price_workbook(
             [
                 ["کد محصول", "قیمت"],
@@ -433,12 +414,22 @@ class PriceImportTests(TestCase):
             ]
         )
         result = import_price_workbook(upload)
-        self.assertEqual(result.updated_variants, 1)
+        self.assertEqual(result.updated_products, 1)
         self.assertEqual(result.errors, [])
-        self.variant.refresh_from_db()
-        self.assertEqual(self.variant.price, 900000)
+        self.sized.refresh_from_db()
+        self.assertEqual(self.sized.price, 900000)
 
-    def test_variant_row_without_slug_is_rejected(self):
+    def test_ambiguous_name_without_slug_is_rejected(self):
+        Product.objects.create(
+            category=self.product.category,
+            brand=self.product.brand,
+            name="لوله قطره‌ای",
+            slug="KSH-P-00000045",
+            blurb="لوله",
+            description="توضیح",
+            price=3000,
+            unit="متر",
+        )
         upload = price_workbook(
             [
                 ["نام", "فشار کاری", "قطر", "قیمت"],
@@ -446,10 +437,10 @@ class PriceImportTests(TestCase):
             ]
         )
         result = import_price_workbook(upload)
-        self.assertEqual(result.updated_variants, 0)
+        self.assertEqual(result.updated_products, 0)
         self.assertEqual(len(result.errors), 1)
-        self.variant.refresh_from_db()
-        self.assertEqual(self.variant.price, 100000)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.price, 1000)
 
     def test_rejects_a_file_that_is_not_xlsx(self):
         upload = BytesIO(b"not excel")
@@ -484,7 +475,7 @@ class PriceImportTests(TestCase):
         sheet = load_workbook(BytesIO(exported.content)).active
         rows = list(sheet.iter_rows(values_only=True))
         self.assertEqual(rows[0][0], "کد محصول")
-        exported_prices = {row[0]: row[4] for row in rows[1:]}
+        exported_prices = {row[0]: row[2] for row in rows[1:]}
         self.assertEqual(exported_prices["olla"], 810000)
         self.assertEqual(exported_prices["KSH-V-00000044"], 100000)
 

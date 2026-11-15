@@ -22,7 +22,7 @@
       <ul class="grid gap-2">
         {% for item in items %}
           <li class="flex items-start justify-between gap-3 text-sm">
-            <span class="min-w-0 break-words">{{ item.quantity|fa_num }} × {{ item.product.name }}{% if item.variant %} ({{ item.variant.spec_label|fa_num }}){% endif %}</span>
+            <span class="min-w-0 break-words">{{ item.quantity|fa_num }} × {{ item.product.name }}{% if item.product.attributes.all %} ({% for attr in item.product.attributes.all %}{{ attr.name }} {{ attr.value|fa_num }}{% if not forloop.last %}، {% endif %}{% endfor %}){% endif %}</span>
             <strong class="shrink-0">{{ item.line_total|fa_num }} تومان</strong>
           </li>
         {% endfor %}

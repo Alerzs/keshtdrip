@@ -7,9 +7,9 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
-from .models import Product, ProductVariant
+from .models import Product
 
-HEADERS = ["کد محصول", "نام", "فشار کاری", "قطر", "قیمت"]
+HEADERS = ["کد محصول", "نام", "قیمت"]
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_ROWS = 5000
 MAX_PRICE = 2_147_483_647
@@ -45,22 +45,16 @@ class PriceImportError(Exception):
 class PriceImportResult:
     def __init__(self):
         self.updated_products = 0
-        self.updated_variants = 0
         self.unchanged = 0
         self.errors = []
 
     @property
     def updated(self):
-        return self.updated_products + self.updated_variants
+        return self.updated_products
 
     def summary(self):
-        parts = []
         if self.updated_products:
-            parts.append(f"{self.updated_products} قیمت محصول")
-        if self.updated_variants:
-            parts.append(f"{self.updated_variants} قیمت تنوع")
-        if parts:
-            text = "به‌روزرسانی شد: " + " و ".join(parts) + "."
+            text = f"به‌روزرسانی شد: {self.updated_products} قیمت محصول."
         else:
             text = "هیچ قیمتی تغییر نکرد."
         if self.unchanged:
@@ -78,25 +72,12 @@ def build_price_workbook():
     for cell in sheet[1]:
         cell.font = Font(bold=True)
 
-    products = Product.objects.prefetch_related("variants").order_by("name", "id")
+    products = Product.objects.order_by("name", "id")
     for product in products:
-        variants = list(product.variants.all())
-        if variants:
-            for variant in variants:
-                sheet.append(
-                    [
-                        variant.slug,
-                        product.name,
-                        variant.working_pressure,
-                        variant.diameter,
-                        variant.price,
-                    ]
-                )
-        else:
-            sheet.append([product.slug, product.name, "", "", product.price])
+        sheet.append([product.slug, product.name, product.price])
 
     sheet.freeze_panes = "A2"
-    for index, width in enumerate((22, 36, 18, 18, 16), start=1):
+    for index, width in enumerate((22, 36, 16), start=1):
         sheet.column_dimensions[get_column_letter(index)].width = width
     if sheet.max_row >= 1:
         sheet.auto_filter.ref = sheet.dimensions
@@ -133,12 +114,8 @@ def import_price_workbook(upload):
     if len(data_rows) > MAX_ROWS:
         raise PriceImportError(f"فایل بیشتر از {MAX_ROWS} ردیف قیمت دارد.")
 
-    products = list(Product.objects.prefetch_related("variants"))
+    products = list(Product.objects.all())
     by_slug = {product.slug: product for product in products}
-    by_variant_slug = {
-        variant.slug: variant
-        for variant in ProductVariant.objects.select_related("product")
-    }
     by_id = {product.pk: product for product in products}
     by_name = defaultdict(list)
     for product in products:
@@ -150,7 +127,7 @@ def import_price_workbook(upload):
             if _row_is_empty(row):
                 continue
             try:
-                _apply_row(row, columns, by_slug, by_id, by_name, by_variant_slug, result)
+                _apply_row(row, columns, by_slug, by_id, by_name, result)
             except PriceImportError as exc:
                 result.errors.append(f"ردیف {offset}: {exc}")
     return result
@@ -173,35 +150,9 @@ def _header_columns(rows):
     raise PriceImportError("فایل خالی است.")
 
 
-def _apply_row(row, columns, by_slug, by_id, by_name, by_variant_slug, result):
+def _apply_row(row, columns, by_slug, by_id, by_name, result):
     price = _parse_price(_cell(row, columns.get("price")))
-    slug = _cell_text(_cell(row, columns.get("slug")))
-    variant = by_variant_slug.get(slug) if slug else None
-    if variant is not None:
-        if variant.price == price:
-            result.unchanged += 1
-            return
-        variant.price = price
-        variant.save(update_fields=["price"])
-        result.updated_variants += 1
-        return
-
     product = _find_product(row, columns, by_slug, by_id, by_name)
-    pressure = _cell_text(_cell(row, columns.get("working_pressure")))
-    diameter = _cell_text(_cell(row, columns.get("diameter")))
-
-    if pressure or diameter:
-        if not slug:
-            raise PriceImportError("کد را برای این تنوع وارد کنید.")
-        variant = _find_variant(product, pressure, diameter)
-        if variant.price == price:
-            result.unchanged += 1
-            return
-        variant.price = price
-        variant.save(update_fields=["price"])
-        result.updated_variants += 1
-        return
-
     if product.price == price:
         result.unchanged += 1
         return
@@ -238,19 +189,6 @@ def _find_product(row, columns, by_slug, by_id, by_name):
     if len(matches) > 1:
         raise PriceImportError(f"چند محصول با نام «{name}» وجود دارد. کد محصول را وارد کنید.")
     return matches[0]
-
-
-def _find_variant(product, pressure, diameter):
-    for variant in product.variants.all():
-        if variant.working_pressure == pressure and variant.diameter == diameter:
-            return variant
-    details = []
-    if pressure:
-        details.append(f"فشار کاری «{pressure}»")
-    if diameter:
-        details.append(f"قطر «{diameter}»")
-    spec = " و ".join(details)
-    raise PriceImportError(f"برای «{product.name}» تنوعی با {spec} پیدا نشد.")
 
 
 def _parse_price(value):

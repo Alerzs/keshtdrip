@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-from products.models import Brand, Category, Product, ProductAttribute, ProductImage, ProductVariant
+from products.models import Brand, Category, Product, ProductAttribute, ProductImage
 
 CATEGORIES = [
     {
@@ -64,7 +64,6 @@ PRODUCTS = [
         "unit": "کیسه",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "equipment",
@@ -77,7 +76,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "equipment",
@@ -90,7 +88,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -103,7 +100,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -116,7 +112,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -129,7 +124,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -142,7 +136,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -155,7 +148,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -168,7 +160,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -181,7 +172,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -194,7 +184,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -207,7 +196,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -220,7 +208,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "pe-pipe",
@@ -233,7 +220,6 @@ PRODUCTS = [
         "unit": "متر",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "equipment",
@@ -246,7 +232,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "پرفروش",
-        "stock": 40,
     },
     {
         "category": "layflat",
@@ -259,7 +244,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "layflat",
@@ -272,7 +256,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "",
-        "stock": 40,
     },
     {
         "category": "drip-tape",
@@ -285,7 +268,6 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "keshtdrip",
         "badge": "پرفروش",
-        "stock": 40,
     },
     {
         "category": "drip-tape",
@@ -298,10 +280,10 @@ PRODUCTS = [
         "unit": "رول",
         "brand": "خوشه-چین",
         "badge": "پرفروش",
-        "stock": 40,
     },
 ]
 
+# Each spec becomes its own product. Diameter and pressure are stored as attributes.
 SPECS = {
     "KSH-P-00000024": [
         {
@@ -875,6 +857,57 @@ IMAGES = {
 }
 
 
+def _spec_attributes(spec, extra):
+    attributes = []
+    order = 0
+    if spec.get("diameter"):
+        attributes.append({"name": "قطر", "value": spec["diameter"], "sort_order": order})
+        order += 1
+    if spec.get("working_pressure"):
+        attributes.append({"name": "فشار کاری", "value": spec["working_pressure"], "sort_order": order})
+        order += 1
+    for attr in extra:
+        attributes.append({**attr, "sort_order": order})
+        order += 1
+    return attributes
+
+
+def _spec_name(name, spec):
+    parts = []
+    if spec.get("diameter"):
+        parts.append(f"قطر {spec['diameter']}")
+    if spec.get("working_pressure"):
+        parts.append(f"فشار کاری {spec['working_pressure']}")
+    if not parts:
+        return name
+    return f"{name} — {'، '.join(parts)}"[:140]
+
+
+def expanded_products():
+    rows = []
+    for row in PRODUCTS:
+        specs = SPECS.get(row["slug"], [])
+        base_attributes = list(ATTRIBUTES.get(row["slug"], []))
+        images = list(IMAGES.get(row["slug"], []))
+        if not specs:
+            data = dict(row)
+            data["featured"] = False
+            data["attributes"] = base_attributes
+            data["images"] = images
+            rows.append(data)
+            continue
+        for spec in specs:
+            data = dict(row)
+            data["slug"] = spec["slug"]
+            data["price"] = spec["price"]
+            data["featured"] = bool(spec.get("featured"))
+            data["name"] = _spec_name(row["name"], spec)
+            data["attributes"] = _spec_attributes(spec, base_attributes)
+            data["images"] = images
+            rows.append(data)
+    return rows
+
+
 class Command(BaseCommand):
     help = "بارگذاری فهرست محصولات"
 
@@ -888,24 +921,24 @@ class Command(BaseCommand):
             cats[row["slug"]] = Category.objects.create(**row)
         for row in BRANDS:
             brands[row["slug"]] = Brand.objects.create(**row)
-        for row in PRODUCTS:
+        products = expanded_products()
+        for row in products:
             data = dict(row)
             category_slug = data.pop("category")
             brand_slug = data.pop("brand")
+            attributes = data.pop("attributes")
+            images = data.pop("images")
             product = Product.objects.create(category=cats[category_slug], brand=brands[brand_slug], **data)
-            for spec in SPECS.get(product.slug, []):
-                ProductVariant.objects.create(product=product, **spec)
-            for attr in ATTRIBUTES.get(product.slug, []):
+            for attr in attributes:
                 ProductAttribute.objects.create(product=product, **attr)
-            for image in IMAGES.get(product.slug, []):
+            for image in images:
                 ProductImage.objects.create(product=product, **image)
-        variant_count = sum(len(items) for items in SPECS.values())
-        attribute_count = sum(len(items) for items in ATTRIBUTES.values())
-        image_count = sum(len(items) for items in IMAGES.values())
+        attribute_count = sum(len(item["attributes"]) for item in products)
+        image_count = sum(len(item["images"]) for item in products)
         self.stdout.write(
             self.style.SUCCESS(
-                f"{len(cats)} دسته، {len(brands)} برند، {len(PRODUCTS)} محصول، "
-                f"{variant_count} تنوع، {attribute_count} ویژگی و {image_count} تصویر ثبت شد."
+                f"{len(cats)} دسته، {len(brands)} برند، {len(products)} محصول، "
+                f"{attribute_count} ویژگی و {image_count} تصویر ثبت شد."
             )
         )
 
@@ -925,7 +958,6 @@ class Command(BaseCommand):
             f"{Category.objects.count()} دسته، "
             f"{Brand.objects.count()} برند، "
             f"{Product.objects.count()} محصول، "
-            f"{ProductVariant.objects.count()} تنوع، "
             f"{ProductAttribute.objects.count()} ویژگی، "
             f"{ProductImage.objects.count()} تصویر"
         )

@@ -272,7 +272,7 @@ def product_seo(request, product, *, price, image="", sku=""):
         "url": url,
         "priceCurrency": "IRR",
         "price": int(price) * 10,
-        "availability": "https://schema.org/InStock" if product.stock else "https://schema.org/OutOfStock",
+        "availability": "https://schema.org/InStock",
         "itemCondition": "https://schema.org/NewCondition",
     }
     product_node = {

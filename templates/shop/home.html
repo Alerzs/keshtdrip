@@ -7,9 +7,9 @@
     {% include "shop/_finder.html" %}
   </section>
 
-  {% include "shop/_rail.html" with variants=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=featured title="پربازدیدترین محصولات" more_url="/shop/" %}
   {% include "shop/_showcase.html" %}
-  {% include "shop/_rail.html" with products=tapes single_variant=True title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
+  {% include "shop/_rail.html" with products=tapes title="نوار تیپ ها" more_url="/shop/?category=drip-tape" %}
   {% if categories %}
   <div class="mx-auto grid w-full max-w-[1440px] grid-cols-2 gap-2 overflow-hidden px-4 lg:grid-cols-6 lg:gap-4 xl:px-20">
     {% for cat in categories|slice:":5" %}
@@ -21,7 +21,7 @@
   </div>
   {% endif %}
 
-  {% include "shop/_rail.html" with products=fresh single_variant=True title="همه محصولات" more_url="/shop/" %}
+  {% include "shop/_rail.html" with products=fresh title="همه محصولات" more_url="/shop/" %}
   {% if blog_posts %}
     {% include "shop/_blog_special.html" %}
   {% endif %}

@@ -1,11 +1,10 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import path
 
-from .models import Brand, Category, Product, ProductAttribute, ProductImage, ProductVariant
+from .models import Brand, Category, Product, ProductAttribute, ProductImage
 from .price_import import PriceImportError, build_price_workbook, import_price_workbook
 
 
@@ -22,12 +21,6 @@ class BrandAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
 
-class ProductVariantInline(admin.TabularInline):
-    model = ProductVariant
-    extra = 1
-    fields = ("slug", "working_pressure", "diameter", "price", "featured", "sort_order")
-
-
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
     extra = 1
@@ -42,11 +35,11 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "brand", "badge", "price", "variant_total", "unit", "featured_variant", "stock")
-    list_filter = ("category", "brand")
-    search_fields = ("name", "blurb")
+    list_display = ("name", "slug", "category", "brand", "badge", "price", "unit", "featured")
+    list_filter = ("category", "brand", "featured")
+    search_fields = ("name", "slug", "blurb")
     prepopulated_fields = {"slug": ("name",)}
-    inlines = [ProductVariantInline, ProductAttributeInline, ProductImageInline]
+    inlines = [ProductAttributeInline, ProductImageInline]
     change_list_template = "admin/products/product/change_list.html"
 
     def get_urls(self):
@@ -105,17 +98,3 @@ class ProductAdmin(admin.ModelAdmin):
         response["Content-Disposition"] = 'attachment; filename="product-prices.xlsx"'
         workbook.save(response)
         return response
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).annotate(variant_total=Count("variants")).prefetch_related("variants")
-
-    @admin.display(description="تنوع‌ها", ordering="variant_total")
-    def variant_total(self, obj):
-        return obj.variant_total
-
-    @admin.display(description="تنوع ویژه")
-    def featured_variant(self, obj):
-        variant = next((item for item in obj.variants.all() if item.featured), None)
-        if variant is None:
-            return "—"
-        return variant.spec_label or variant.slug

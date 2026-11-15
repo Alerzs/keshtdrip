@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 from . import cart as cart_store
 from .blog_posts import all_posts, featured_posts, get_post, grouped_posts, related_posts
 from .images import image_fit, image_src, sibling_image_urls
-from .models import Brand, Category, Product, ProductVariant
+from .models import Brand, Category, Product
 from .seo import PRIVATE_DESCRIPTION, absolute_url, attach, blog_seo, catalog_seo, pack, product_seo
 
 
@@ -51,94 +51,66 @@ def _product_gallery(product):
 
 def _catalog(qs=None):
     products = qs if qs is not None else Product.objects.all()
-    return products.select_related("category", "brand").prefetch_related("variants", "attributes")
-
-
-def _unique_values(values):
-    seen = []
-    for value in values:
-        if value and value not in seen:
-            seen.append(value)
-    return seen
-
-
-def _variant_payload(variants):
-    return [
-        {
-            "id": variant.id,
-            "slug": variant.slug,
-            "working_pressure": variant.working_pressure,
-            "diameter": variant.diameter,
-            "price": variant.price,
-        }
-        for variant in variants
-    ]
+    return products.select_related("category", "brand").prefetch_related("attributes")
 
 
 def _cart_items(session):
     raw = cart_store.get_cart(session)
-    parsed = []
-    product_ids = []
+    merged = {}
     for key, qty in raw.items():
         try:
-            product_id, variant_id = cart_store.parse_line_key(key)
+            product_id = cart_store.parse_line_key(key)
+            quantity = int(qty)
         except (TypeError, ValueError):
             continue
-        product_ids.append(product_id)
-        parsed.append((str(key), product_id, variant_id, qty))
+        if quantity < 1:
+            continue
+        merged[product_id] = merged.get(product_id, 0) + quantity
     products = {
         product.id: product
-        for product in Product.objects.filter(id__in=product_ids)
+        for product in Product.objects.filter(id__in=merged)
         .select_related("category", "brand")
-        .prefetch_related("variants")
+        .prefetch_related("attributes")
     }
     items = []
     total = 0
     cleaned = {}
-    for key, product_id, variant_id, qty in parsed:
+    for product_id, qty in merged.items():
         product = products.get(product_id)
         if product is None:
             continue
-        variant = None
-        if variant_id is not None:
-            variant = next((item for item in product.variants.all() if item.id == variant_id), None)
-            if variant is None:
-                continue
-        unit_price = variant.price if variant else product.price
+        unit_price = product.price
         line = unit_price * qty
         total += line
-        max_choice = min(max(product.stock, qty), 10)
-        qty_list = list(range(1, max_choice + 1))
+        qty_list = list(range(1, 11))
         if qty not in qty_list:
             qty_list.append(qty)
             qty_list.sort()
+        key = str(product_id)
         cleaned[key] = qty
         items.append(
             {
                 "key": key,
                 "product": product,
-                "variant": variant,
                 "quantity": qty,
                 "unit_price": unit_price,
                 "line_total": line,
                 "qty_list": qty_list,
             }
         )
-    if len(cleaned) != len(raw):
+    if cleaned != {str(key): value for key, value in raw.items()}:
         cart_store.save_cart(session, cleaned)
     return items, total
 
 
-def _featured_variants(in_cart_ids=None):
-    variants = ProductVariant.objects.filter(featured=True).select_related(
-        "product", "product__category", "product__brand"
-    ).prefetch_related("product__attributes")
+def _featured_products(in_cart_ids=None):
+    products = Product.objects.filter(featured=True).select_related("category", "brand").prefetch_related("attributes")
     if in_cart_ids is not None:
-        variants = variants.filter(product__stock__gt=0).exclude(product_id__in=in_cart_ids)
-    return variants.order_by("product__name", "sort_order", "id")
+        products = products.exclude(id__in=in_cart_ids)
+    return products.order_by("name", "id")
 
 
-HOME_CACHE_KEY = "shop-home-v1"
+HOME_CACHE_KEY = "shop-home-v2"
 HOME_RAIL_LIMIT = 12
 
 
@@ -167,7 +139,7 @@ def home(request):
         categories = list(Category.objects.all())
         payload = {
             "categories": categories,
-            "featured": _home_rail(_featured_variants()),
+            "featured": _home_rail(_featured_products()),
             "fresh": _home_rail(_catalog().order_by("-created_at")),
             "showcase": [
                 {"category": cat, "image_url": image_fit(cat.showcase_image, 1280)}
@@ -217,16 +189,9 @@ def catalog(request):
 
 def product_detail(request, slug):
     product = get_object_or_404(
-        Product.objects.select_related("category", "brand").prefetch_related("images", "variants"),
+        Product.objects.select_related("category", "brand").prefetch_related("images", "attributes"),
         slug=slug,
     )
-    variants = list(product.variants.all())
-    selected_variant = None
-    requested = request.GET.get("variant", "").strip()
-    if requested.isdigit():
-        selected_variant = next((variant for variant in variants if variant.id == int(requested)), None)
-    if selected_variant is None and variants:
-        selected_variant = variants[0]
     related = _catalog(
         Product.objects.filter(category=product.category).exclude(pk=product.pk)
     )[:4]
@@ -241,9 +206,9 @@ def product_detail(request, slug):
         product_seo(
             request,
             product,
-            price=selected_variant.price if selected_variant else product.price,
+            price=product.price,
             image=image,
-            sku=selected_variant.slug if selected_variant else product.slug,
+            sku=product.slug,
         ),
     )
     return render(
@@ -253,39 +218,21 @@ def product_detail(request, slug):
             "product": product,
             "related": related,
             "gallery": gallery,
-            "variants": variants,
-            "pressures": _unique_values(variant.working_pressure for variant in variants),
-            "diameters": _unique_values(variant.diameter for variant in variants),
-            "selected_variant": selected_variant,
-            "display_price": selected_variant.price if selected_variant else product.price,
-            "variant_payload": _variant_payload(variants),
         },
     )
 
 
 @require_POST
 def add_to_cart(request, slug):
-    product = get_object_or_404(Product.objects.prefetch_related("variants"), slug=slug)
-    qty = max(1, int(request.POST.get("quantity", 1)))
-    variants = list(product.variants.all())
-    variant = None
-    if variants:
-        submitted_slug = (request.POST.get("variant_slug") or "").strip()
-        if not submitted_slug:
-            messages.error(request, "کد این تنوع ارسال نشده است.")
-            return redirect(product.get_absolute_url())
-        variant = next((item for item in variants if item.slug == submitted_slug), None)
-        if variant is None:
-            messages.error(request, "این تنوع موجود نیست.")
-            return redirect(product.get_absolute_url())
-    cart_store.add_item(request.session, product.id, qty, variant.id if variant else None)
-    label = product.name
-    if variant and variant.spec_label:
-        label = f"{product.name} — {variant.spec_label}"
-    messages.success(request, f"«{label}» به سبد خرید افزوده شد.")
-    next_url = request.POST.get("next") or (
-        variant.get_absolute_url() if variant else product.get_absolute_url()
-    )
+    product = get_object_or_404(Product, slug=slug)
+    try:
+        qty = int(request.POST.get("quantity", 1))
+    except (TypeError, ValueError):
+        qty = 1
+    qty = max(1, qty)
+    cart_store.add_item(request.session, product.id, qty)
+    messages.success(request, f"«{product.name}» به سبد خرید افزوده شد.")
+    next_url = request.POST.get("next") or product.get_absolute_url()
     return redirect(next_url)
 
 
@@ -305,7 +252,7 @@ def remove_from_cart(request, line_key):
 def cart_view(request):
     items, total = _cart_items(request.session)
     in_cart_ids = [item["product"].id for item in items]
-    featured = _featured_variants(in_cart_ids)
+    featured = _featured_products(in_cart_ids)
     return render(
         request,
         "shop/cart.html",
